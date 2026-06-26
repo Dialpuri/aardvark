@@ -1,0 +1,61 @@
+.svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.bar {
+  fill: var(--brand);
+  fill-opacity: 0.16;
+}
+
+/* The bin the marker falls in, and the marker itself, inherit the status
+   colour via currentColor so a single class drives both fill and stroke. */
+.bar.ok,
+.bar.warn,
+.bar.bad {
+  fill: currentColor;
+  fill-opacity: 0.85;
+}
+
+.ok {
+  color: var(--ok);
+}
+.warn {
+  color: var(--warn);
+}
+.bad {
+  color: var(--bad);
+}
+
+.axis {
+  stroke: var(--border-strong);
+  stroke-width: 1;
+}
+
+.tick {
+  fill: var(--faint);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-anchor: middle;
+}
+
+.marker {
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-dasharray: 3 3;
+}
+
+.markerChip {
+  fill: currentColor;
+}
+
+.markerLabel {
+  fill: var(--card);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  text-anchor: middle;
+  dominant-baseline: central;
+}

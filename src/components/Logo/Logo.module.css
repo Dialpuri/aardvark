@@ -1,0 +1,27 @@
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--brand);
+  flex-shrink: 0;
+}
+
+.diamond {
+  border: 2.5px solid #fff;
+  border-radius: 3px;
+  transform: rotate(45deg);
+}
+
+.wordmark {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 20px;
+  letter-spacing: -0.015em;
+  color: var(--ink-strong);
+}

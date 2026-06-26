@@ -1,0 +1,112 @@
+:root {
+  /* Typography */
+  --font-sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Space Grotesk', var(--font-sans);
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  /* Surfaces */
+  --bg: #fbfbfd;
+  --card: #fff;
+  --tint: #eeeefb;
+  --subtle: #f3f3f7;
+
+  /* Ink */
+  --ink: #1b1b22;
+  --ink-strong: #16161c;
+  --ink-2: #26262e;
+  --muted: #5b5b66;
+  --muted-2: #62626c;
+  --faint: #9a9aa3;
+  --faint-2: #a2a2ab;
+
+  /* Brand */
+  --brand: #3f3dd6;
+  --brand-hover: #3330b8;
+  --brand-shadow: rgba(63, 61, 214, 0.22);
+
+  /* Borders */
+  --border: #ececf1;
+  --border-strong: #e3e3ee;
+  --border-input: #e2e2ea;
+
+  /* Status */
+  --ok: #1f8f5f;
+  --ok-tint: #e8f5ee;
+  --warn: #d98a2b;
+  --bad: #d6452e;
+
+  /* Elevation */
+  --shadow-card: 0 24px 60px -28px rgba(40, 40, 70, 0.3);
+  --shadow-pop: 0 8px 22px -10px rgba(40, 40, 70, 0.3);
+
+  /* Layout */
+  --maxw: 1180px;
+  --radius: 18px;
+
+  color-scheme: light;
+  color: var(--ink);
+  background: var(--bg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100svh;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+::selection {
+  background: #d9d8fb;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  color: var(--ink-strong);
+  margin: 0;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: var(--font-sans);
+  cursor: pointer;
+}
+
+/* Visible keyboard-focus ring for all interactive elements. Uses
+   :focus-visible so it only shows for keyboard/programmatic focus, not on
+   mouse click. Modern browsers follow the element's border-radius. */
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+code,
+kbd {
+  font-family: var(--font-mono);
+}
+
+/* Entrance/interaction animation is handled by framer-motion (see
+   src/lib/motion.ts), which honours prefers-reduced-motion at runtime. */

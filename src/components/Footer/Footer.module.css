@@ -1,0 +1,21 @@
+.wrap {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 40px 32px 70px;
+}
+
+.inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--border);
+  padding-top: 26px;
+  font-size: 13px;
+  color: var(--faint);
+}
+
+.version {
+  font-family: var(--font-mono);
+}

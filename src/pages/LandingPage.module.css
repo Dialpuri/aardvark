@@ -1,0 +1,212 @@
+.navLink {
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.navLink:hover {
+  color: var(--ink);
+}
+
+/* Hero */
+.hero {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 40px 32px 20px;
+  display: grid;
+  grid-template-columns: 1.04fr 0.96fr;
+  gap: 60px;
+  align-items: center;
+}
+
+.title {
+  font-weight: 600;
+  font-size: 55px;
+  line-height: 1.04;
+  letter-spacing: -0.025em;
+  margin: 26px 0 22px;
+}
+
+.lede {
+  font-size: 19px;
+  line-height: 1.55;
+  color: var(--muted);
+  margin: 0 0 34px;
+  max-width: 480px;
+  text-wrap: pretty;
+}
+
+.heroActions {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.heroVisual {
+  position: relative;
+}
+
+.cardHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.formula {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: #8a8a93;
+}
+
+.scorePill {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ok);
+  background: var(--ok-tint);
+  padding: 4px 9px;
+  border-radius: 7px;
+}
+
+.molecule {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 0 4px;
+}
+
+/* Floating annotation chips */
+.chips {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.chip {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  padding: 8px 12px;
+  box-shadow: var(--shadow-pop);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink);
+}
+
+.chipDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.chipA {
+  top: 42px;
+  left: -22px;
+}
+
+.chipB {
+  top: 150px;
+  right: -26px;
+}
+
+.chipC {
+  bottom: 34px;
+  left: -14px;
+}
+
+/* Features */
+.features {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 66px 32px 30px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+/* How it works */
+.how {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 52px 32px 30px;
+}
+
+.howHead {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: 30px;
+}
+
+.howHead h2 {
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.howSub {
+  font-size: 14px;
+  color: var(--faint);
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid var(--border);
+}
+
+.step {
+  padding: 26px;
+  border-left: 1px solid var(--border);
+}
+
+.step:first-child {
+  padding-left: 0;
+  border-left: none;
+}
+
+.stepNum {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--brand);
+}
+
+.stepTitle {
+  font-size: 17px;
+  font-weight: 600;
+  margin: 12px 0 7px;
+}
+
+.stepBody {
+  font-size: 14px;
+  line-height: 1.55;
+  color: #6a6a74;
+}
+
+@media (max-width: 900px) {
+  .hero {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+  .title {
+    font-size: 42px;
+  }
+  .features,
+  .steps {
+    grid-template-columns: 1fr;
+  }
+  .step,
+  .step:first-child {
+    padding: 22px 0;
+    border-left: none;
+    border-top: 1px solid var(--border);
+  }
+  .steps {
+    border-top: none;
+  }
+}
