@@ -1,0 +1,18 @@
+.box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+/* CSS width wins over RDKit's inline width/height attributes, so the SVG
+   scales to the container while keeping its aspect ratio. */
+.box svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.message {
+  font-size: 0.8125rem;
+  color: var(--faint);
+}

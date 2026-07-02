@@ -1,7 +1,7 @@
 .logo {
   display: inline-flex;
   align-items: center;
-  gap: 11px;
+  gap: var(--space-3);
 }
 
 .badge {
@@ -14,14 +14,29 @@
 
 .diamond {
   border: 2.5px solid #fff;
-  border-radius: 3px;
+  border-radius: 2px;
   transform: rotate(45deg);
 }
 
+.wordmarkGroup {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.0625rem;
+  line-height: 1.05;
+}
+
 .wordmark {
-  font-family: var(--font-display);
+  font-family: var(--font-sans);
   font-weight: 600;
-  font-size: 20px;
-  letter-spacing: -0.015em;
+  font-size: 1rem;
+  letter-spacing: 0.14em;
   color: var(--ink-strong);
+}
+
+.expansion {
+  font-size: 0.5625rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--muted-2);
+  white-space: nowrap;
 }

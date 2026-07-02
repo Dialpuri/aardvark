@@ -1,0 +1,1 @@
+export { MoleculeSvg } from './MoleculeSvg'

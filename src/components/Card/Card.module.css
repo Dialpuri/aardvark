@@ -2,11 +2,11 @@
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 28px;
+  padding: var(--space-7);
 }
 
 .elevated {
-  border-radius: 22px;
-  padding: 30px;
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
   box-shadow: var(--shadow-card);
 }

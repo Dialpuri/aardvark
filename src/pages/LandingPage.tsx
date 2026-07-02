@@ -5,10 +5,30 @@ import { Badge } from '@/components/Badge'
 import { Card } from '@/components/Card'
 import { FeatureCard } from '@/components/FeatureCard'
 import { Footer } from '@/components/Footer'
-import { MoleculeGlyph } from '@/components/MoleculeGlyph'
+import { MoleculeSvg } from '@/components/MoleculeSvg'
+import type { HighlightQuery, RgbColor } from '@/lib/rdkit'
 import { SquareGlyph, BarsGlyph, CircleGlyph } from '@/components/icons'
 import { chipIn, floatIn, staggerContainer } from '@/lib/motion'
 import styles from './LandingPage.module.css'
+
+const CAFFEINE_SMILES = 'CN1C=NC2=C1C(=O)N(C(=O)N2C)C'
+
+// Pale clinical tints matching the status colours used across the UI.
+const STATUS_TINT: Record<'ok' | 'warn' | 'bad', RgbColor> = {
+  ok: [0.61, 0.82, 0.73],
+  warn: [0.91, 0.81, 0.59],
+  bad: [0.91, 0.67, 0.62],
+}
+
+// Bonds are selected by chemical pattern, so this generalises to any molecule:
+// a urea carbonyl reads "normal", an amide carbonyl "borderline", and a
+// ring-fusion double bond "outlier". For caffeine these resolve to C2=O2,
+// C6=O6 and C4=C5 respectively — the three bonds called out by the chips.
+const CAFFEINE_HIGHLIGHTS: HighlightQuery[] = [
+  { smarts: '[#8]=[#6;$([#6]([#7])[#7])]', color: STATUS_TINT.ok },
+  { smarts: '[#8]=[#6;$([#6]([#7])[#6])]', color: STATUS_TINT.warn },
+  { smarts: '[cR2][cR2]', color: STATUS_TINT.bad },
+]
 
 const features = [
   {
@@ -47,9 +67,9 @@ const steps = [
 ]
 
 const chips = [
-  { className: styles.chipA, dot: '#1f8f5f', label: 'C2=O2 · 1.223 Å' },
-  { className: styles.chipB, dot: '#d98a2b', label: 'C6=O6 · borderline' },
-  { className: styles.chipC, dot: '#d6452e', label: 'C4=C5 · outlier' },
+  { className: styles.chipA, dot: '#1f8a61', label: 'C2=O2 · 1.223 Å' },
+  { className: styles.chipB, dot: '#bd7d22', label: 'C6=O6 · borderline' },
+  { className: styles.chipC, dot: '#bf3b2b', label: 'C4=C5 · outlier' },
 ]
 
 export default function LandingPage() {
@@ -106,7 +126,13 @@ export default function LandingPage() {
               <span className={styles.scorePill}>29 / 32 normal</span>
             </div>
             <div className={styles.molecule}>
-              <MoleculeGlyph bondStatus={{ 7: 'warn', 4: 'bad' }} />
+              <MoleculeSvg
+                smiles={CAFFEINE_SMILES}
+                width={320}
+                height={240}
+                highlights={CAFFEINE_HIGHLIGHTS}
+                label="Caffeine skeletal structure with highlighted bonds"
+              />
             </div>
           </Card>
 

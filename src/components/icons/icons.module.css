@@ -1,25 +1,25 @@
 .square {
-  width: 16px;
-  height: 16px;
+  width: 1rem;
+  height: 1rem;
   border: 2.4px solid var(--brand);
-  border-radius: 4px;
+  border-radius: 0.25rem;
 }
 
 .circle {
-  width: 16px;
-  height: 16px;
+  width: 1rem;
+  height: 1rem;
   border: 2.4px solid var(--brand);
   border-radius: 50%;
 }
 
 .bars {
   display: flex;
-  gap: 3px;
+  gap: 0.1875rem;
   align-items: flex-end;
 }
 
 .bars span {
-  width: 4px;
+  width: 0.25rem;
   background: var(--brand);
-  border-radius: 1px;
+  border-radius: 0.0625rem;
 }

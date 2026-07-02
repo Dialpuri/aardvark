@@ -9,9 +9,9 @@ export function SquareGlyph() {
 export function BarsGlyph() {
   return (
     <span className={styles.bars}>
-      <span style={{ height: 10 }} />
-      <span style={{ height: 16 }} />
-      <span style={{ height: 8 }} />
+      <span style={{ height: '0.625rem' }} />
+      <span style={{ height: '1rem' }} />
+      <span style={{ height: '0.5rem' }} />
     </span>
   )
 }

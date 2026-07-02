@@ -1,47 +1,70 @@
 :root {
-  /* Typography */
+  /* Typography — one coherent family. Serif headings over a clinical sans
+     body, with mono reserved for measured data. */
   --font-sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-display: 'Space Grotesk', var(--font-sans);
+  --font-display: 'IBM Plex Serif', Georgia, 'Times New Roman', serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
 
-  /* Surfaces */
-  --bg: #fbfbfd;
-  --card: #fff;
-  --tint: #eeeefb;
-  --subtle: #f3f3f7;
+  /* Surfaces — cool, paper-clean whites */
+  --bg: #f6f8fa;
+  --card: #ffffff;
+  --tint: #ebf1f7;
+  --subtle: #eef1f5;
 
-  /* Ink */
-  --ink: #1b1b22;
-  --ink-strong: #16161c;
-  --ink-2: #26262e;
-  --muted: #5b5b66;
-  --muted-2: #62626c;
-  --faint: #9a9aa3;
-  --faint-2: #a2a2ab;
+  /* Ink — near-black with a faint cool cast */
+  --ink: #16202b;
+  --ink-strong: #0e1820;
+  --ink-2: #1f2a36;
+  --muted: #54616e;
+  --muted-2: #5b6874;
+  --faint: #8b97a3;
+  --faint-2: #98a4af;
 
-  /* Brand */
-  --brand: #3f3dd6;
-  --brand-hover: #3330b8;
-  --brand-shadow: rgba(63, 61, 214, 0.22);
+  /* Brand — a deep, instrument-grade clinical blue */
+  --brand: #1f5d82;
+  --brand-hover: #184c6c;
+  --brand-shadow: rgba(31, 93, 130, 0.16);
 
-  /* Borders */
-  --border: #ececf1;
-  --border-strong: #e3e3ee;
-  --border-input: #e2e2ea;
+  /* Borders — crisp cool hairlines */
+  --border: #e4e8ed;
+  --border-strong: #d8dde4;
+  --border-input: #d3d9e0;
 
-  /* Status */
-  --ok: #1f8f5f;
-  --ok-tint: #e8f5ee;
-  --warn: #d98a2b;
-  --bad: #d6452e;
+  /* Status — restrained, clinical semantics */
+  --ok: #1f8a61;
+  --ok-tint: #e7f2ec;
+  --warn: #bd7d22;
+  --bad: #bf3b2b;
 
-  /* Elevation */
-  --shadow-card: 0 24px 60px -28px rgba(40, 40, 70, 0.3);
-  --shadow-pop: 0 8px 22px -10px rgba(40, 40, 70, 0.3);
+  /* Elevation — minimal and precise; structure comes from borders */
+  --shadow-card:
+    0 1px 1px rgba(16, 32, 48, 0.04), 0 16px 40px -28px rgba(16, 32, 48, 0.22);
+  --shadow-pop: 0 2px 10px -4px rgba(16, 32, 48, 0.16);
+
+  /* Spacing — a single rem-based rhythm. Every padding, margin and gap in the
+     app references one of these tokens so spacing stays consistent and scales
+     with the user's root font size. */
+  --space-1: 0.25rem; /* 4px  */
+  --space-2: 0.5rem; /* 8px  */
+  --space-3: 0.75rem; /* 12px */
+  --space-4: 0.875rem; /* 14px */
+  --space-5: 1rem; /* 16px */
+  --space-6: 1.25rem; /* 20px */
+  --space-7: 1.5rem; /* 24px */
+  --space-8: 2rem; /* 32px */
+  --space-9: 2.5rem; /* 40px */
+  --space-10: 3rem; /* 48px */
+  --space-11: 4rem; /* 64px */
+
+  /* Corner radii */
+  --radius-xs: 0.375rem; /* 6px  */
+  --radius-sm: 0.5rem; /* 8px  */
+  --radius: 0.75rem; /* 12px */
+  --radius-lg: 0.875rem; /* 14px */
+  --radius-pill: 999px;
 
   /* Layout */
-  --maxw: 1180px;
-  --radius: 18px;
+  --maxw: 73.75rem; /* 1180px */
 
   color-scheme: light;
   color: var(--ink);
@@ -69,7 +92,7 @@ body {
 }
 
 ::selection {
-  background: #d9d8fb;
+  background: #cfe0ee;
 }
 
 h1,
@@ -77,7 +100,9 @@ h2,
 h3,
 h4 {
   font-family: var(--font-display);
+  font-weight: 500;
   color: var(--ink-strong);
+  letter-spacing: -0.01em;
   margin: 0;
 }
 
@@ -99,8 +124,8 @@ button {
    :focus-visible so it only shows for keyboard/programmatic focus, not on
    mouse click. Modern browsers follow the element's border-radius. */
 :focus-visible {
-  outline: 2px solid var(--brand);
-  outline-offset: 2px;
+  outline: 0.125rem solid var(--brand);
+  outline-offset: 0.125rem;
 }
 
 code,

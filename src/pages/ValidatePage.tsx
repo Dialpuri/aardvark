@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import { useQuery } from '@tanstack/react-query'
 import { Navbar } from '@/components/Navbar'
 import { Button } from '@/components/Button'
-import { Histogram, type HistogramStatus } from '@/components/Histogram'
-import { floatIn, staggerContainer } from '@/lib/motion'
-import { sampleNormal } from '@/lib/sample'
+import { ValidationReport } from '@/components/ValidationReport'
+import { floatIn } from '@/lib/motion'
+import type { AnalyzeResponse } from '@/types/cod'
 import styles from './ValidatePage.module.css'
 
 type Tab = 'smiles' | 'file'
@@ -16,43 +17,62 @@ const examples = [
   { name: 'ibuprofen', smiles: 'CC(C)CC1=CC=C(C=C1)C(C)C(=O)O' },
 ]
 
-// Sample distributions for the demo report — one row per measured bond.
-const results: {
-  bond: string
-  value: number
-  status: HistogramStatus
-  data: number[]
-}[] = [
-  {
-    bond: 'C2=O2',
-    value: 1.223,
-    status: 'ok',
-    data: sampleNormal(1.224, 0.012, 400, 11),
-  },
-  {
-    bond: 'C6=O6',
-    value: 1.262,
-    status: 'warn',
-    data: sampleNormal(1.231, 0.013, 400, 22),
-  },
-  {
-    bond: 'C4=C5',
-    value: 1.41,
-    status: 'bad',
-    data: sampleNormal(1.357, 0.011, 400, 33),
-  },
-]
-
-const statusLabel: Record<HistogramStatus, string> = {
-  ok: 'normal',
-  warn: 'borderline',
-  bad: 'outlier',
+// A captured COD-server response, served as a static asset for the demo. In
+// production this comes back from POST /analyze/cif for the submitted structure.
+async function fetchSampleReport(): Promise<AnalyzeResponse> {
+  const res = await fetch(`${import.meta.env.BASE_URL}sample/A1C3B.json`)
+  if (!res.ok) throw new Error(`Failed to load sample report (${res.status})`)
+  return res.json()
 }
 
 export default function ValidatePage() {
   const [tab, setTab] = useState<Tab>('smiles')
   const [smiles, setSmiles] = useState('CN1C=NC2=C1C(=O)N(C(=O)N2C)C')
   const [submitted, setSubmitted] = useState(false)
+
+  const report = useQuery({
+    queryKey: ['sample-report', 'A1C3B'],
+    queryFn: fetchSampleReport,
+    enabled: submitted,
+  })
+
+  // Once submitted, hand the whole screen over to the report so there's room to
+  // actually read the distributions.
+  if (submitted) {
+    return (
+      <div>
+        <Navbar>
+          <button
+            className={styles.backButton}
+            onClick={() => setSubmitted(false)}
+          >
+            ← Validate another structure
+          </button>
+        </Navbar>
+
+        <motion.div
+          className={styles.reportWrap}
+          variants={floatIn}
+          initial="hidden"
+          animate="visible"
+        >
+          <h1 className={styles.reportTitle}>Geometry report</h1>
+          <p className={styles.note}>
+            Every bond and angle is scored against the COD reference
+            distribution for that given chemical environment.
+          </p>
+
+          {report.isPending && (
+            <p className={styles.status}>Loading reference geometry…</p>
+          )}
+          {report.isError && (
+            <p className={styles.status}>Couldn’t load the sample report.</p>
+          )}
+          {report.data && <ValidationReport report={report.data} />}
+        </motion.div>
+      </div>
+    )
+  }
 
   return (
     <div>
@@ -70,8 +90,8 @@ export default function ValidatePage() {
       >
         <h1 className={styles.title}>Validate a structure</h1>
         <p className={styles.subtitle}>
-          Paste a SMILES string or upload a coordinate file. Everything runs
-          locally in your browser.
+          Paste a SMILES string or upload a coordinate file. Your structure is
+          scored against the COD reference geometry server.
         </p>
 
         <div className={styles.panel}>
@@ -138,50 +158,12 @@ export default function ValidatePage() {
             >
               Validate geometry →
             </button>
-
-            {submitted && (
-              <motion.div
-                className={styles.results}
-                variants={staggerContainer(0.1)}
-                initial="hidden"
-                animate="visible"
-              >
-                <p className={styles.note}>
-                  Sample report — every bond scored against its reference
-                  distribution.
-                </p>
-                {results.map((r) => (
-                  <motion.div
-                    key={r.bond}
-                    className={styles.result}
-                    variants={floatIn}
-                  >
-                    <div className={styles.resultHead}>
-                      <span className={styles.resultBond}>{r.bond}</span>
-                      <span className={styles.resultValue}>{r.value} Å</span>
-                      <span
-                        className={`${styles.resultStatus} ${styles[r.status]}`}
-                      >
-                        {statusLabel[r.status]}
-                      </span>
-                    </div>
-                    <Histogram
-                      data={r.data}
-                      value={r.value}
-                      status={r.status}
-                      unit=" Å"
-                      label={`${r.bond} bond length: ${r.value} Å (${statusLabel[r.status]})`}
-                    />
-                  </motion.div>
-                ))}
-              </motion.div>
-            )}
           </div>
         </div>
 
         <p className={styles.privacy}>
-          Your structure never leaves your machine. Reference distributions are
-          bundled with the app.
+          Your structure is sent to the geometry server over an encrypted
+          connection and scored against the COD reference distributions.
         </p>
       </motion.div>
     </div>

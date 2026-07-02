@@ -41,6 +41,14 @@
   text-anchor: middle;
 }
 
+.axisLabel {
+  fill: var(--muted);
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 500;
+  text-anchor: middle;
+}
+
 .marker {
   stroke: currentColor;
   stroke-width: 1.5;

@@ -26,6 +26,8 @@ interface CommonProps {
   format?: (n: number) => string
   /** Accessible description; also used to derive a default summary. */
   label?: string
+  /** Caption drawn centered under the x-axis ticks, e.g. "Bond length (Å)". */
+  axisLabel?: string
   /** viewBox dimensions — the SVG scales responsively to its container. */
   width?: number
   height?: number
@@ -56,6 +58,8 @@ export function Histogram(props: HistogramProps) {
   const layout = useMemo(() => {
     const width = props.width ?? DEFAULT_W
     const height = props.height ?? DEFAULT_H
+    // Reserve an extra row of space below the ticks for the axis caption.
+    const marginBottom = props.axisLabel ? M.bottom + 16 : M.bottom
 
     // Normalise raw observations and pre-binned input to one shape.
     let boxes: HistogramBin[]
@@ -84,7 +88,7 @@ export function Histogram(props: HistogramProps) {
     const yMax = max(boxes, (b) => b.count) ?? 1
     const y = scaleLinear()
       .domain([0, yMax])
-      .range([height - M.bottom, M.top])
+      .range([height - marginBottom, M.top])
 
     const markerX = props.value === undefined ? null : x(props.value)
     const markerBin =
@@ -104,8 +108,10 @@ export function Histogram(props: HistogramProps) {
       x,
       y,
       ticks: x.ticks(5),
-      baseline: height - M.bottom,
+      baseline: height - marginBottom,
       right: width - M.right,
+      midX: (M.left + (width - M.right)) / 2,
+      tickY: height - marginBottom + 16,
       gap: boxes.length > 40 ? 0.5 : 1.5,
       markerX,
       markerBin,
@@ -122,6 +128,7 @@ export function Histogram(props: HistogramProps) {
     props.domain,
     props.width,
     props.height,
+    props.axisLabel,
   ])
 
   const format = props.format ?? defaultFormat
@@ -176,15 +183,20 @@ export function Histogram(props: HistogramProps) {
       />
 
       {layout.ticks.map((t) => (
-        <text
-          key={t}
-          x={layout.x(t)}
-          y={layout.height - 6}
-          className={styles.tick}
-        >
+        <text key={t} x={layout.x(t)} y={layout.tickY} className={styles.tick}>
           {format(t)}
         </text>
       ))}
+
+      {props.axisLabel && (
+        <text
+          x={layout.midX}
+          y={layout.height - 4}
+          className={styles.axisLabel}
+        >
+          {props.axisLabel}
+        </text>
+      )}
 
       {layout.markerX !== null && (
         <g className={statusClass[props.status ?? 'ok']}>

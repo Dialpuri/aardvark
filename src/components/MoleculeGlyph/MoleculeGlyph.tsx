@@ -52,9 +52,9 @@ const BONDS: Bond[] = [
 ]
 
 const HIGHLIGHT: Record<BondStatus, string> = {
-  ok: '#1f8f5f',
-  warn: '#d98a2b',
-  bad: '#d6452e',
+  ok: '#1f8a61',
+  warn: '#bd7d22',
+  bad: '#bf3b2b',
 }
 
 interface MoleculeGlyphProps {
@@ -135,7 +135,7 @@ export function MoleculeGlyph({
                   y1={y1 + oy}
                   x2={x2 + ox}
                   y2={y2 + oy}
-                  stroke="#2c2c34"
+                  stroke="#16202b"
                   strokeWidth={1.7}
                   strokeLinecap="round"
                 />
@@ -144,7 +144,7 @@ export function MoleculeGlyph({
                   y1={y1 - oy}
                   x2={x2 - ox}
                   y2={y2 - oy}
-                  stroke="#2c2c34"
+                  stroke="#16202b"
                   strokeWidth={1.7}
                   strokeLinecap="round"
                 />
@@ -169,7 +169,7 @@ export function MoleculeGlyph({
         const x = px(a)
         const y = py(a)
         const col =
-          a.el === 'N' ? '#2f5fd0' : a.el === 'O' ? '#c0392b' : '#5a5a66'
+          a.el === 'N' ? '#2b6da3' : a.el === 'O' ? '#bf3b2b' : '#54616e'
         const wide = a.label.length > 1
         return (
           <Fragment key={idx}>
