@@ -3,13 +3,16 @@ import App from '@/App'
 import LandingPage from '@/pages/LandingPage'
 import ValidatePage from '@/pages/ValidatePage'
 
-export const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <App />,
-    children: [
-      { index: true, element: <LandingPage /> },
-      { path: 'validate', element: <ValidatePage /> },
-    ],
-  },
-])
+export const router = createBrowserRouter(
+  [
+    {
+      path: '/',
+      element: <App />,
+      children: [
+        { index: true, element: <LandingPage /> },
+        { path: 'validate', element: <ValidatePage /> },
+      ],
+    },
+  ],
+  { basename: import.meta.env.BASE_URL },
+)
