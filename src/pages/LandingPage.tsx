@@ -4,7 +4,6 @@ import { Button } from '@/components/Button'
 import { Badge } from '@/components/Badge'
 import { Card } from '@/components/Card'
 import { FeatureCard } from '@/components/FeatureCard'
-import { Footer } from '@/components/Footer'
 import { MoleculeSvg } from '@/components/MoleculeSvg'
 import type { HighlightQuery, RgbColor } from '@/lib/rdkit'
 import { SquareGlyph, BarsGlyph, CircleGlyph } from '@/components/icons'
@@ -99,7 +98,7 @@ export default function LandingPage() {
             actually plausible?
           </h1>
           <p className={styles.lede}>
-            Geometra checks every bond length and angle in your structure
+            AARDVARK checks every bond length and angle in your structure
             against the distributions seen across thousands of known molecules —
             so you can trust the geometry before it costs you.
           </p>
@@ -190,8 +189,6 @@ export default function LandingPage() {
           ))}
         </div>
       </section>
-
-      <Footer />
     </div>
   )
 }

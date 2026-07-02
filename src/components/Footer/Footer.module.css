@@ -1,7 +1,8 @@
 .wrap {
   max-width: var(--maxw);
   margin: 0 auto;
-  padding: var(--space-9) var(--space-8) var(--space-11);
+  padding: var(--space-7) var(--space-8);
+  border-top: 1px solid var(--border);
 }
 
 .inner {
@@ -10,12 +11,10 @@
   align-items: center;
   gap: var(--space-5);
   flex-wrap: wrap;
-  border-top: 1px solid var(--border);
-  padding-top: var(--space-7);
   font-size: 0.8125rem;
   color: var(--faint);
 }
 
 .version {
-  font-family: var(--font-mono);
+  font-family: var(--font-mono), serif;
 }

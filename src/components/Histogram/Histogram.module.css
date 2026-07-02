@@ -36,14 +36,14 @@
 
 .tick {
   fill: var(--faint);
-  font-family: var(--font-mono);
+  font-family: var(--font-mono), serif;
   font-size: 10px;
   text-anchor: middle;
 }
 
 .axisLabel {
   fill: var(--muted);
-  font-family: var(--font-sans);
+  font-family: var(--font-sans), serif;
   font-size: 10px;
   font-weight: 500;
   text-anchor: middle;
@@ -61,7 +61,7 @@
 
 .markerLabel {
   fill: var(--card);
-  font-family: var(--font-mono);
+  font-family: var(--font-mono), serif;
   font-size: 10px;
   font-weight: 500;
   text-anchor: middle;

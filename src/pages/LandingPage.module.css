@@ -55,13 +55,13 @@
 }
 
 .formula {
-  font-family: var(--font-mono);
+  font-family: var(--font-mono), serif;
   font-size: 0.8125rem;
   color: var(--faint);
 }
 
 .scorePill {
-  font-family: var(--font-mono);
+  font-family: var(--font-mono), serif;
   font-size: 0.75rem;
   color: var(--ok);
   background: var(--ok-tint);
@@ -93,7 +93,7 @@
   border-radius: var(--radius);
   padding: var(--space-2) var(--space-3);
   box-shadow: var(--shadow-pop);
-  font-family: var(--font-mono);
+  font-family: var(--font-mono), serif;
   font-size: 0.75rem;
   color: var(--ink);
 }
@@ -171,7 +171,7 @@
 }
 
 .stepNum {
-  font-family: var(--font-mono);
+  font-family: var(--font-mono), serif;
   font-size: 0.8125rem;
   color: var(--brand);
 }

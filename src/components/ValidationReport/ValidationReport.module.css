@@ -41,7 +41,7 @@
 }
 
 .ligand {
-  font-family: var(--font-mono);
+  font-family: var(--font-mono), serif;
   font-size: 1rem;
   font-weight: 500;
   color: var(--ink);
@@ -125,13 +125,13 @@
 }
 
 .atoms {
-  font-family: var(--font-mono);
+  font-family: var(--font-mono), serif;
   font-size: 0.8125rem;
   color: var(--ink);
 }
 
 .value {
-  font-family: var(--font-mono);
+  font-family: var(--font-mono), serif;
   font-size: 0.8125rem;
   color: var(--muted);
   margin-right: auto;
@@ -148,7 +148,7 @@
 }
 
 .sigma {
-  font-family: var(--font-mono);
+  font-family: var(--font-mono), serif;
   font-size: 0.6875rem;
   opacity: 0.85;
 }
@@ -210,7 +210,7 @@
   margin: 0;
   padding-bottom: var(--space-3);
   border-bottom: 1px solid var(--border);
-  font-family: var(--font-sans);
+  font-family: var(--font-sans), serif;
   font-size: 0.6875rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -219,7 +219,7 @@
 }
 
 .panelMeta {
-  font-family: var(--font-mono);
+  font-family: var(--font-mono), serif;
   font-size: 0.6875rem;
   font-weight: 400;
   letter-spacing: 0;
@@ -269,7 +269,7 @@
 
 .figures dd {
   margin: 0;
-  font-family: var(--font-mono);
+  font-family: var(--font-mono), serif;
   font-size: 0.8125rem;
   color: var(--ink);
 }
@@ -277,7 +277,7 @@
 .figures dd[title] {
   cursor: help;
   border-bottom: 1px dotted var(--border-strong);
-  font-family: var(--font-sans);
+  font-family: var(--font-sans), serif;
 }
 
 .noReference {

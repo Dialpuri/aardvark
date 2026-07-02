@@ -13,7 +13,7 @@
 }
 
 .diamond {
-  border: 2.5px solid #fff;
+  border: 3px solid #fff;
   border-radius: 2px;
   transform: rotate(45deg);
 }
@@ -26,7 +26,7 @@
 }
 
 .wordmark {
-  font-family: var(--font-sans);
+  font-family: var(--font-sans), serif;
   font-weight: 600;
   font-size: 1rem;
   letter-spacing: 0.14em;
@@ -39,4 +39,9 @@
   letter-spacing: 0.01em;
   color: var(--muted-2);
   white-space: nowrap;
+}
+
+.initial {
+  font-weight: 700;
+  color: var(--brand);
 }

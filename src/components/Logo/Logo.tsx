@@ -1,4 +1,17 @@
+import { Fragment } from 'react'
 import styles from './Logo.module.css'
+
+/** Source words of the acronym; the leading letter of each spells AARDVARK. */
+const EXPANSION = [
+  'Acedrg',
+  'Atom-type',
+  'Reference',
+  'Data',
+  'Validation',
+  'And',
+  'Reporting',
+  'Kit',
+]
 
 interface LogoProps {
   /** Side length of the badge in px. */
@@ -29,8 +42,16 @@ export function Logo({
         <span className={styles.wordmarkGroup}>
           <span className={styles.wordmark}>AARDVARK</span>
           {withExpansion && (
-            <span className={styles.expansion}>
-              Acedrg Atom-type Reference Data Validation And Reporting Kit
+            <span className={styles.expansion} aria-label={EXPANSION.join(' ')}>
+              {EXPANSION.map((word, i) => (
+                <Fragment key={word}>
+                  {i > 0 && ' '}
+                  <span aria-hidden className={styles.initial}>
+                    {word[0]}
+                  </span>
+                  {word.slice(1)}
+                </Fragment>
+              ))}
             </span>
           )}
         </span>

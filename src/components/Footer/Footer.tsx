@@ -4,8 +4,10 @@ export function Footer() {
   return (
     <footer className={styles.wrap}>
       <div className={styles.inner}>
-        <span>Geometra · Free geometry validation for small molecules.</span>
-        <span className={styles.version}>v1.0 · built for chemists</span>
+        <span>
+          AARDVARK · Free geometry validation for small molecules using ACEDRG.
+        </span>
+        <span className={styles.version}>v0.0 · built for everyone</span>
       </div>
     </footer>
   )

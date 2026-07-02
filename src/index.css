@@ -69,7 +69,7 @@
   color-scheme: light;
   color: var(--ink);
   background: var(--bg);
-  font-family: var(--font-sans);
+  font-family: var(--font-sans), serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -99,7 +99,7 @@ h1,
 h2,
 h3,
 h4 {
-  font-family: var(--font-display);
+  font-family: var(--font-display), serif;
   font-weight: 500;
   color: var(--ink-strong);
   letter-spacing: -0.01em;

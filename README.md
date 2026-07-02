@@ -1,6 +1,4 @@
-# aardvark
-
-A modern React + TypeScript starter built with Vite.
+# AARDVARK - Acedrg atom-type reference data and validation kit
 
 ## Stack
 
@@ -52,8 +50,3 @@ src/
   router.tsx    route definitions
   main.tsx      app entry (providers)
 ```
-
-This is a recreation of the **Geometra** molecular-geometry validation UI:
-design tokens in `src/index.css`, fonts Space Grotesk / IBM Plex Sans / Mono,
-and a faithful caffeine `MoleculeGlyph` SVG. Entrance animations use
-`framer-motion` (`src/lib/motion.ts`).
