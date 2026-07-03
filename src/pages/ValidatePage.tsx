@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useQuery } from '@tanstack/react-query'
@@ -6,6 +6,12 @@ import { Navbar } from '@/components/Navbar'
 import { Button } from '@/components/Button'
 import { ValidationReport } from '@/components/ValidationReport'
 import { floatIn } from '@/lib/motion'
+import {
+  analyze,
+  formatFromFilename,
+  wrapInput,
+  type AnalyzeRequest,
+} from '@/lib/analyze'
 import type { AnalyzeResponse } from '@/types/cod'
 import styles from './ValidatePage.module.css'
 
@@ -17,34 +23,57 @@ const examples = [
   { name: 'ibuprofen', smiles: 'CC(C)CC1=CC=C(C=C1)C(C)C(=O)O' },
 ]
 
-// A captured COD-server response, served as a static asset for the demo. In
-// production this comes back from POST /analyze/cif for the submitted structure.
-async function fetchSampleReport(): Promise<AnalyzeResponse> {
-  const res = await fetch(`${import.meta.env.BASE_URL}sample/A1C3B.json`)
-  if (!res.ok) throw new Error(`Failed to load sample report (${res.status})`)
-  return res.json()
+const FILE_ACCEPT = '.cif,.mol,.sdf,.mol2,.pdb,.ent'
+
+// Send the wrapped structure to the geometry server (answered in dev by the
+// dummy server, see vite/mockAnalyze). On static hosting with no server (e.g.
+// GitHub Pages) the POST fails, so fall back to the captured sample response so
+// the demo still renders.
+async function runAnalysis(input: AnalyzeRequest): Promise<AnalyzeResponse> {
+  try {
+    return await analyze(input)
+  } catch {
+    const res = await fetch(`${import.meta.env.BASE_URL}sample/A1C3B.json`)
+    if (!res.ok) throw new Error(`Failed to load sample report (${res.status})`)
+    return res.json()
+  }
 }
 
 export default function ValidatePage() {
   const [tab, setTab] = useState<Tab>('smiles')
   const [smiles, setSmiles] = useState('CN1C=NC2=C1C(=O)N(C(=O)N2C)C')
-  const [submitted, setSubmitted] = useState(false)
+  const [file, setFile] = useState<File | null>(null)
+  const [request, setRequest] = useState<AnalyzeRequest | null>(null)
+  const fileInput = useRef<HTMLInputElement>(null)
 
   const report = useQuery({
-    queryKey: ['sample-report', 'A1C3B'],
-    queryFn: fetchSampleReport,
-    enabled: submitted,
+    queryKey: ['analyze', request],
+    queryFn: () => runAnalysis(request!),
+    enabled: request !== null,
   })
+
+  const fileFormat = file ? formatFromFilename(file.name) : null
+  const canSubmit =
+    tab === 'smiles' ? smiles.trim() !== '' : fileFormat !== null
+
+  async function submit() {
+    if (tab === 'smiles') {
+      setRequest(wrapInput('smiles', smiles.trim()))
+      return
+    }
+    if (!file || fileFormat === null) return
+    setRequest(wrapInput(fileFormat, await file.text()))
+  }
 
   // Once submitted, hand the whole screen over to the report so there's room to
   // actually read the distributions.
-  if (submitted) {
+  if (request !== null) {
     return (
       <div>
         <Navbar>
           <button
             className={styles.backButton}
-            onClick={() => setSubmitted(false)}
+            onClick={() => setRequest(null)}
           >
             ← Validate another structure
           </button>
@@ -66,7 +95,7 @@ export default function ValidatePage() {
             <p className={styles.status}>Loading reference geometry…</p>
           )}
           {report.isError && (
-            <p className={styles.status}>Couldn’t load the sample report.</p>
+            <p className={styles.status}>Couldn’t analyse that structure.</p>
           )}
           {report.data && <ValidationReport report={report.data} />}
         </motion.div>
@@ -138,14 +167,43 @@ export default function ValidatePage() {
                 </div>
               </>
             ) : (
-              <div className={styles.dropzone}>
+              <div
+                className={styles.dropzone}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => {
+                  e.preventDefault()
+                  setFile(e.dataTransfer.files?.[0] ?? null)
+                }}
+              >
+                <input
+                  ref={fileInput}
+                  type="file"
+                  accept={FILE_ACCEPT}
+                  className={styles.fileInput}
+                  onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+                />
                 <span className={styles.dropIcon} />
-                <div className={styles.dropTitle}>
-                  Drop a <code>.mol</code> / <code>.sdf</code> /{' '}
-                  <code>.pdb</code> file
-                </div>
+                {file ? (
+                  <div className={styles.dropTitle}>
+                    {file.name}
+                    {fileFormat === null && (
+                      <span className={styles.fileError}>
+                        {' '}
+                        — unsupported file type
+                      </span>
+                    )}
+                  </div>
+                ) : (
+                  <div className={styles.dropTitle}>
+                    Drop a <code>.cif</code> / <code>.mol</code> /{' '}
+                    <code>.pdb</code> file
+                  </div>
+                )}
                 <div className={styles.dropOr}>or</div>
-                <Button variant="secondary" onClick={() => setSubmitted(true)}>
+                <Button
+                  variant="secondary"
+                  onClick={() => fileInput.current?.click()}
+                >
                   Browse files
                 </Button>
               </div>
@@ -153,8 +211,8 @@ export default function ValidatePage() {
 
             <button
               className={styles.submit}
-              disabled={tab === 'smiles' && smiles.trim() === ''}
-              onClick={() => setSubmitted(true)}
+              disabled={!canSubmit}
+              onClick={() => void submit()}
             >
               Validate geometry →
             </button>

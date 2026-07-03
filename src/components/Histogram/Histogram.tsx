@@ -162,7 +162,7 @@ export function Histogram(props: HistogramProps) {
             height={Math.max(0, layout.baseline - layout.y(b.count))}
             rx={2}
             className={`${styles.bar} ${hit ? statusClass[props.status ?? 'ok'] : ''}`}
-            style={{ transformBox: 'fill-box', transformOrigin: 'bottom' }}
+            style={{ transformBox: 'fill-box', originY: 1 }}
             initial={reduce ? false : { scaleY: 0 }}
             animate={{ scaleY: 1 }}
             transition={{

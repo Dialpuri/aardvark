@@ -20,6 +20,22 @@ export interface AtomType {
   'level-4': string
 }
 
+/**
+ * One raw COD observation contributing to a record's reference stats — a single
+ * matching bond/angle measured in a real Crystallography Open Database entry.
+ */
+export interface Observation {
+  /** COD entry id; see `codEntryUrl` for the crystallography.net link. */
+  cod_id: number
+  /** The measured value in that entry — Å for bonds, degrees for angles. */
+  value: number
+  /** Atom names of the matching bond/angle within the COD entry. */
+  atom_1: string
+  atom_2: string
+  /** Vertex atom name — angle observations only. */
+  centre?: string
+}
+
 /** Adaptive-bin histogram of the reference population. */
 export interface CodHistogram {
   /** `counts[i]` spans `edges[i]` → `edges[i + 1]`. Length = nbins (20–80). */
@@ -45,12 +61,20 @@ interface GeometryRecord {
   delta: number | null
   /**
    * `delta / sd` — how many SDs this value sits from the COD population.
-   * This is the number to drive outlier colouring. `null` with no reference.
+   * Surfaced per row and offered as a sort key; outlier colouring is driven by
+   * |delta| against per-kind cutoffs (see `outlierStatus`). `null` with no
+   * reference.
    */
   n_sigma: number | null
   histogram: CodHistogram
   /** Self-contained depiction with these atoms highlighted; `null` if none. */
   svg: string | null
+  /**
+   * The raw contributing observations. Only emitted for non-`element` rungs and
+   * capped server-side (`MAX_OBS = 10000`), so `obs.length` can be far below `N`.
+   * Absent when the server didn't supply them.
+   */
+  obs?: Observation[]
 }
 
 /** One measured bond. `atom_1`/`atom_2` are atom names from the cif. */

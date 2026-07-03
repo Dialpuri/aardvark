@@ -140,6 +140,14 @@
   font-size: 0.8125rem;
 }
 
+.fileInput {
+  display: none;
+}
+
+.fileError {
+  color: var(--bad);
+}
+
 .dropOr {
   font-size: 0.8125rem;
   color: var(--faint);

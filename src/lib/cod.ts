@@ -10,16 +10,32 @@ import type { AngleRecord, BondRecord, CodHistogram, Rung } from '@/types/cod'
  */
 export type GeometryStatus = HistogramStatus | 'none'
 
-/** |n_sigma| below this is unremarkable. */
-const WARN_SIGMA = 2
-/** |n_sigma| at or above this is a clear outlier. */
-const BAD_SIGMA = 3
+/** Canonical page for a COD entry, e.g. `.../cod/1553293.html`. */
+export function codEntryUrl(codId: number): string {
+  return `https://www.crystallography.net/cod/${codId}.html`
+}
 
-export function outlierStatus(nSigma: number | null): GeometryStatus {
-  if (nSigma === null) return 'none'
-  const mag = Math.abs(nSigma)
-  if (mag >= BAD_SIGMA) return 'bad'
-  if (mag >= WARN_SIGMA) return 'warn'
+/**
+ * Absolute deviation from the COD mean (|delta|, in Å / °) at or above which a
+ * record is a clear outlier — separate cutoffs per geometry kind.
+ */
+const OUTLIER_DELTA = { bond: 0.05, angle: 1.9 }
+/** Borderline (amber) starts at 80% of the outlier cutoff. */
+const BORDERLINE_FRACTION = 0.8
+
+/**
+ * Classify a record by how far its measured value sits from the COD mean, in
+ * raw Å (bonds) or ° (angles). `none` when the record carried no reference
+ * distribution (an `element`-rung backstop), so there's nothing to score.
+ */
+export function outlierStatus(
+  record: BondRecord | AngleRecord,
+): GeometryStatus {
+  if (record.delta === null) return 'none'
+  const cutoff = 'atom_3' in record ? OUTLIER_DELTA.angle : OUTLIER_DELTA.bond
+  const mag = Math.abs(record.delta)
+  if (mag >= cutoff) return 'bad'
+  if (mag >= cutoff * BORDERLINE_FRACTION) return 'warn'
   return 'ok'
 }
 
@@ -106,3 +122,27 @@ export function byOutlierSeverity(
   const bv = b.n_sigma === null ? -Infinity : Math.abs(b.n_sigma)
   return bv - av
 }
+
+/**
+ * Sort records worst-first by |delta| — the raw Å/° gap from the COD mean,
+ * ignoring how tight the reference population is. Records with no reference
+ * sink to the bottom. Only meaningful within one kind (bonds OR angles), since
+ * the units differ.
+ */
+export function byAbsoluteDeviation(
+  a: BondRecord | AngleRecord,
+  b: BondRecord | AngleRecord,
+): number {
+  const av = a.delta === null ? -Infinity : Math.abs(a.delta)
+  const bv = b.delta === null ? -Infinity : Math.abs(b.delta)
+  return bv - av
+}
+
+/** Rungs best (most specific) → worst; drives the "by rung" grouped view. */
+export const RUNG_ORDER: Rung[] = [
+  'full',
+  'main',
+  'nb1nb2',
+  'hybrid',
+  'element',
+]
