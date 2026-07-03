@@ -5,9 +5,12 @@ export function Footer() {
     <footer className={styles.wrap}>
       <div className={styles.inner}>
         <span>
-          AARDVARK · Free geometry validation for small molecules using ACEDRG.
+          AARDVARK · Open dictionary validation for small molecules using ACEDRG
+          and COD.
         </span>
-        <span className={styles.version}>v0.0 · built for everyone</span>
+        <span className={styles.version}>
+          v0.0 · MRC Laboratory of Molecular Biology
+        </span>
       </div>
     </footer>
   )

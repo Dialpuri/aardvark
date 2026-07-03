@@ -200,26 +200,44 @@ export function Histogram(props: HistogramProps) {
 
       {layout.markerX !== null && (
         <g className={statusClass[props.status ?? 'ok']}>
-          <line
+          <motion.line
             x1={layout.markerX}
             x2={layout.markerX}
             y1={M.top - 6}
             y2={layout.baseline}
             className={styles.marker}
+            style={{ transformBox: 'fill-box', originY: 1 }}
+            initial={reduce ? false : { scaleY: 0, opacity: 0 }}
+            animate={{ scaleY: 1, opacity: 1 }}
+            transition={{
+              duration: 0.45,
+              delay: reduce ? 0 : 0.15,
+              ease: [0.16, 1, 0.3, 1],
+            }}
           />
           <g transform={`translate(${layout.chipX}, ${M.top - 9})`}>
-            <rect
-              x={-22}
-              y={-11}
-              width={44}
-              height={18}
-              rx={5}
-              className={styles.markerChip}
-            />
-            <text className={styles.markerLabel}>
-              {format(props.value!)}
-              {props.unit ?? ''}
-            </text>
+            <motion.g
+              initial={reduce ? false : { opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                duration: 0.3,
+                delay: reduce ? 0 : 0.45,
+                ease: [0.16, 1, 0.3, 1],
+              }}
+            >
+              <rect
+                x={-22}
+                y={-11}
+                width={44}
+                height={18}
+                rx={5}
+                className={styles.markerChip}
+              />
+              <text className={styles.markerLabel}>
+                {format(props.value!)}
+                {props.unit ?? ''}
+              </text>
+            </motion.g>
           </g>
         </g>
       )}
