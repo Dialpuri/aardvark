@@ -1,1 +1,0 @@
-export { MoleculeSvg } from './MoleculeSvg'

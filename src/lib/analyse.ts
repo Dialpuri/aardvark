@@ -1,14 +1,14 @@
-import type { AnalyzeResponse } from '@/types/cod'
+import type { AnalyseResponse } from '@/types/cod'
 
 /** Input formats the geometry server accepts. It types/parses each itself. */
 export type InputFormat = 'smiles' | 'cif' | 'mol' | 'pdb'
 
 /**
- * Request body for the geometry server's `POST /analyze`: the raw structure
+ * Request body for the geometry server's `POST /analyse`: the raw structure
  * text plus a tag telling the server how to read it, and an optional ligand
  * code. See `data/sample-server-output/` for the response shape.
  */
-export interface AnalyzeRequest {
+export interface AnalyseRequest {
   format: InputFormat
   /** SMILES string, or the full text of a CIF / MOL / PDB file. */
   data: string
@@ -16,11 +16,13 @@ export interface AnalyzeRequest {
 }
 
 /**
- * Where analyze requests are sent. Overridable at build time with
- * `VITE_ANALYZE_URL`; defaults to the dev dummy server (see `vite/mockAnalyze`).
+ * Where analyse requests are sent. Overridable at build time with
+ * `VITE_ANALYSE_URL`; defaults to the dev dummy server (see `vite/mockAnalyse`).
  */
-export const ANALYZE_URL: string =
-  import.meta.env.VITE_ANALYZE_URL ?? '/api/analyze'
+export const ANALYSE_URL: string =
+  import.meta.env.VITE_ANALYSE_URL ?? '/api/analyse'
+
+// https://quicillith.pl/run_aardvark
 
 /** Map a dropped/selected file's extension to an {@link InputFormat}. */
 export function formatFromFilename(name: string): InputFormat | null {
@@ -41,23 +43,18 @@ export function formatFromFilename(name: string): InputFormat | null {
 }
 
 /** Build the JSON payload the server expects from raw structure text. */
-export function wrapInput(
-  format: InputFormat,
-  data: string,
-  compId?: string,
-): AnalyzeRequest {
-  const body: AnalyzeRequest = { format, data }
-  if (compId) body.comp_id = compId
-  return body
+export function wrapInput(format: InputFormat, data: string): AnalyseRequest {
+  return { format, data }
 }
 
 /** POST a structure to the geometry server and return the parsed analysis. */
-export async function analyze(input: AnalyzeRequest): Promise<AnalyzeResponse> {
-  const res = await fetch(ANALYZE_URL, {
+export async function analyse(input: AnalyseRequest): Promise<AnalyseResponse> {
+  console.log(input)
+  const res = await fetch(ANALYSE_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input),
   })
-  if (!res.ok) throw new Error(`Analyze request failed (${res.status})`)
+  if (!res.ok) throw new Error(`Analyse request failed (${res.status})`)
   return res.json()
 }

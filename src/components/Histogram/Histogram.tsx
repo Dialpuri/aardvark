@@ -16,6 +16,8 @@ export interface HistogramBin {
 interface CommonProps {
   /** Optional "your value" marker drawn over the distribution. */
   value?: number
+  /** Optional reference-population mean, drawn as a neutral guide line. */
+  mean?: number
   /** Colour of the marker and the bin it falls in. */
   status?: HistogramStatus
   /** Fix the x-domain. Defaults to the span of the bins. */
@@ -91,6 +93,7 @@ export function Histogram(props: HistogramProps) {
       .range([height - marginBottom, M.top])
 
     const markerX = props.value === undefined ? null : x(props.value)
+    const meanX = props.mean === undefined ? null : x(props.mean)
     const markerBin =
       props.value === undefined
         ? -1
@@ -114,6 +117,10 @@ export function Histogram(props: HistogramProps) {
       tickY: height - marginBottom + 16,
       gap: boxes.length > 40 ? 0.5 : 1.5,
       markerX,
+      meanX,
+      // Keep the μ label clear of the value marker: sit it on whichever side of
+      // the mean line the value marker isn't (default left when there's none).
+      meanLabelLeft: markerX === null || markerX >= (meanX ?? -Infinity),
       markerBin,
       chipX:
         markerX === null
@@ -125,6 +132,7 @@ export function Histogram(props: HistogramProps) {
     props.data,
     props.binCount,
     props.value,
+    props.mean,
     props.domain,
     props.width,
     props.height,
@@ -196,6 +204,25 @@ export function Histogram(props: HistogramProps) {
         >
           {props.axisLabel}
         </text>
+      )}
+      {layout.meanX !== null && (
+        <g>
+          <line
+            x1={layout.meanX}
+            x2={layout.meanX}
+            y1={M.top}
+            y2={layout.baseline}
+            className={styles.meanLine}
+          />
+          <text
+            x={layout.meanX + (layout.meanLabelLeft ? -3 : 3)}
+            y={M.top + 1}
+            className={styles.meanLabel}
+            style={{ textAnchor: layout.meanLabelLeft ? 'end' : 'start' }}
+          >
+            μ
+          </text>
+        </g>
       )}
 
       {layout.markerX !== null && (

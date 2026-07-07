@@ -111,6 +111,37 @@ export function geometryLabel(record: BondRecord | AngleRecord): string {
 }
 
 /**
+ * Element symbol from a cif atom name, e.g. `"P11" → "P"`, `"BR1" → "Br"`.
+ * Cif names lead with the element's letters (any case) then a serial number, so
+ * take the leading run of letters and normalise to standard capitalisation.
+ */
+export function elementOf(atomName: string): string {
+  const letters = atomName.match(/^[A-Za-z]+/)?.[0] ?? atomName
+  return letters.charAt(0).toUpperCase() + letters.slice(1).toLowerCase()
+}
+
+/** The distinct elements a record's atoms are drawn from. */
+export function recordElements(record: BondRecord | AngleRecord): string[] {
+  const names =
+    'atom_3' in record
+      ? [record.atom_1, record.atom_2, record.atom_3]
+      : [record.atom_1, record.atom_2]
+  return [...new Set(names.map(elementOf))]
+}
+
+/** Every element present across a report's bonds and angles, sorted. */
+export function reportElements(report: {
+  bonds: BondRecord[]
+  angles: AngleRecord[]
+}): string[] {
+  const seen = new Set<string>()
+  for (const record of [...report.bonds, ...report.angles]) {
+    for (const el of recordElements(record)) seen.add(el)
+  }
+  return [...seen].sort()
+}
+
+/**
  * Sort records worst-first: largest |n_sigma| leads, records with no reference
  * (unscorable X–H geometry) sink to the bottom.
  */

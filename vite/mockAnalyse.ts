@@ -3,21 +3,21 @@ import { fileURLToPath, URL } from 'node:url'
 import type { Plugin } from 'vite'
 
 /**
- * Dev-only stand-in for the COD geometry server. Answers `POST /api/analyze`
+ * Dev-only stand-in for the COD geometry server. Answers `POST /api/analyse`
  * with the captured sample response, ignoring the posted structure (any
  * format) — enough to exercise the client wrap/request path end to end.
- * Swap in the real server by setting `VITE_ANALYZE_URL`.
+ * Swap in the real server by setting `VITE_ANALYSE_URL`.
  */
-export function mockAnalyze(): Plugin {
+export function mockAnalyse(): Plugin {
   const samplePath = fileURLToPath(
     new URL('../public/sample/A1C3B.json', import.meta.url),
   )
 
   return {
-    name: 'mock-analyze',
+    name: 'mock-analyse',
     apply: 'serve',
     configureServer(server) {
-      server.middlewares.use('/api/analyze', (req, res, next) => {
+      server.middlewares.use('/api/analyse', (req, res, next) => {
         if (req.method !== 'POST') return next()
         // Drain the request body so the socket closes, then reply.
         req.on('data', () => {})

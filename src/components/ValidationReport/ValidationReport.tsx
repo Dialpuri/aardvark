@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Histogram, type HistogramStatus } from '@/components/Histogram'
 import { floatIn, staggerContainer } from '@/lib/motion'
@@ -12,21 +12,23 @@ import {
   hasReference,
   histogramBins,
   outlierStatus,
+  recordElements,
   reportDepiction,
+  reportElements,
   rungDescription,
   rungLabel,
   statusLabel,
 } from '@/lib/cod'
 import type {
   AngleRecord,
-  AnalyzeResponse,
+  AnalyseResponse,
   BondRecord,
   Observation,
 } from '@/types/cod'
 import styles from './ValidationReport.module.css'
 
 interface ValidationReportProps {
-  report: AnalyzeResponse
+  report: AnalyseResponse
 }
 
 type Kind = 'bonds' | 'angles'
@@ -76,13 +78,52 @@ export function ValidationReport(props: ValidationReportProps) {
   const [kind, setKind] = useState<Kind>('bonds')
   const [sortKey, setSortKey] = useState<SortKey>('deviation')
   const [viewMode, setViewMode] = useState<ViewMode>('list')
+  // Elements the user has filtered to. Empty = no filter (show everything).
+  const [elementFilter, setElementFilter] = useState<Set<string>>(new Set())
+
+  const elements = useMemo(() => reportElements(props.report), [props.report])
 
   const sorted = useMemo(() => {
     const compare = SORTS[sortKey].compare
-    const bonds = [...props.report.bonds].sort(compare)
-    const angles = [...props.report.angles].sort(compare)
+    // Keep records whose atoms include any selected element.
+    const keep = (r: BondRecord | AngleRecord) =>
+      elementFilter.size === 0 ||
+      recordElements(r).some((el) => elementFilter.has(el))
+    const bonds = props.report.bonds.filter(keep).sort(compare)
+    const angles = props.report.angles.filter(keep).sort(compare)
     return { bonds, angles }
-  }, [props.report, sortKey])
+  }, [props.report, sortKey, elementFilter])
+
+  function toggleElement(el: string) {
+    setElementFilter((prev) => {
+      const next = new Set(prev)
+      if (next.has(el)) next.delete(el)
+      else next.add(el)
+      return next
+    })
+  }
+
+  const chipsRef = useRef<HTMLDivElement>(null)
+  const [chipFade, setChipFade] = useState({ left: false, right: false })
+
+  useEffect(() => {
+    const el = chipsRef.current
+    if (!el) return
+    const update = () => {
+      setChipFade({
+        left: el.scrollLeft > 1,
+        right: Math.ceil(el.scrollLeft + el.clientWidth) < el.scrollWidth,
+      })
+    }
+    update()
+    const observer = new ResizeObserver(update)
+    observer.observe(el)
+    el.addEventListener('scroll', update, { passive: true })
+    return () => {
+      observer.disconnect()
+      el.removeEventListener('scroll', update)
+    }
+  }, [elements])
 
   const outliers = useMemo(() => {
     const all = [...props.report.bonds, ...props.report.angles]
@@ -141,43 +182,90 @@ export function ValidationReport(props: ValidationReportProps) {
       </div>
 
       <div className={styles.controls}>
-        <label className={styles.sortLabel}>
-          Sort by
-          <select
-            className={styles.sortSelect}
-            value={sortKey}
-            onChange={(e) => setSortKey(e.target.value as SortKey)}
-          >
-            {(Object.keys(SORTS) as SortKey[]).map((key) => (
-              <option key={key} value={key}>
-                {SORTS[key].label}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <div
-          className={styles.viewToggle}
-          role="tablist"
-          aria-label="View mode"
-        >
-          {(['list', 'rung'] as ViewMode[]).map((mode) => (
-            <button
-              key={mode}
-              role="tab"
-              aria-selected={viewMode === mode}
-              className={`${styles.viewOption} ${
-                viewMode === mode ? styles.viewOptionActive : ''
-              }`}
-              onClick={() => setViewMode(mode)}
+        {elements.length > 1 && (
+          <div className={styles.elementFilter}>
+            <span className={styles.filterLabel}>Elements</span>
+            <div
+              ref={chipsRef}
+              className={`${styles.filterChips} ${
+                chipFade.left ? styles.fadeLeft : ''
+              } ${chipFade.right ? styles.fadeRight : ''}`}
+              role="group"
+              aria-label="Filter by element"
             >
-              {mode === 'list' ? 'List' : 'By rung'}
-            </button>
-          ))}
+              {elements.map((el) => {
+                const active = elementFilter.has(el)
+                return (
+                  <button
+                    key={el}
+                    type="button"
+                    aria-pressed={active}
+                    className={`${styles.filterChip} ${
+                      active ? styles.filterChipActive : ''
+                    }`}
+                    onClick={() => toggleElement(el)}
+                  >
+                    {el}
+                  </button>
+                )
+              })}
+            </div>
+            {elementFilter.size > 0 && (
+              <button
+                type="button"
+                className={styles.filterClear}
+                onClick={() => setElementFilter(new Set())}
+              >
+                Clear
+              </button>
+            )}
+          </div>
+        )}
+
+        <div className={styles.sortControls}>
+          <label className={styles.sortLabel}>
+            Sort by
+            <select
+              className={styles.sortSelect}
+              value={sortKey}
+              onChange={(e) => setSortKey(e.target.value as SortKey)}
+            >
+              {(Object.keys(SORTS) as SortKey[]).map((key) => (
+                <option key={key} value={key}>
+                  {SORTS[key].label}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <div
+            className={styles.viewToggle}
+            role="tablist"
+            aria-label="View mode"
+          >
+            {(['list', 'rung'] as ViewMode[]).map((mode) => (
+              <button
+                key={mode}
+                role="tab"
+                aria-selected={viewMode === mode}
+                className={`${styles.viewOption} ${
+                  viewMode === mode ? styles.viewOptionActive : ''
+                }`}
+                onClick={() => setViewMode(mode)}
+              >
+                {mode === 'list' ? 'List' : 'By rung'}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      {viewMode === 'list' ? (
+      {records.length === 0 ? (
+        <p className={styles.empty}>
+          No {KINDS[kind].label.toLowerCase()} contain the selected element
+          {elementFilter.size > 1 ? 's' : ''}.
+        </p>
+      ) : viewMode === 'list' ? (
         <motion.ul
           key={kind}
           className={styles.list}
@@ -329,6 +417,7 @@ function GeometryRow(props: GeometryRowProps) {
                     className={styles.histogram}
                     bins={histogramBins(record.histogram)}
                     value={record.value}
+                    mean={record.mean ?? undefined}
                     status={status as HistogramStatus}
                     unit={cfg.unit.trim()}
                     format={cfg.format}

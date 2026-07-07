@@ -95,12 +95,20 @@
   box-shadow: 0 1px 2px rgba(16, 32, 48, 0.08);
 }
 
-/* Sort + view controls */
+/* Element filter + sort + view controls, sharing one row */
 .controls {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
   gap: var(--space-4);
+}
+
+/* Sort dropdown + view toggle, pinned to the right of the row. */
+.sortControls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-shrink: 0;
+  margin-left: auto;
 }
 
 .sortLabel {
@@ -159,6 +167,111 @@
   color: var(--ink);
   font-weight: 500;
   box-shadow: 0 1px 2px rgba(16, 32, 48, 0.08);
+}
+
+/* Element filter — fills the space left of the sort controls and scrolls
+   horizontally when the structure has more elements than fit. */
+.elementFilter {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.filterLabel {
+  font-size: 0.75rem;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.filterChips {
+  display: flex;
+  gap: var(--space-2);
+  /* Hug the chips so the Clear button sits right after them, but allow the
+     lane to shrink and scroll when the chips outgrow the available width. */
+  flex: 0 1 auto;
+  min-width: 0;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding-bottom: 3px;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Fade whichever edge has more chips to scroll to; applied by ValidationReport
+   only when the lane overflows, so a short list keeps its last chip crisp. */
+.filterChips.fadeRight {
+  mask-image: linear-gradient(
+    to right,
+    #000 calc(100% - var(--space-5)),
+    transparent 100%
+  );
+}
+
+.filterChips.fadeLeft {
+  mask-image: linear-gradient(to right, transparent 0, #000 var(--space-5));
+}
+
+.filterChips.fadeLeft.fadeRight {
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 var(--space-5),
+    #000 calc(100% - var(--space-5)),
+    transparent 100%
+  );
+}
+
+.filterChip {
+  flex-shrink: 0;
+  min-width: 1.75rem;
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--card);
+  font-family: var(--font-mono), serif;
+  font-size: 0.75rem;
+  color: var(--ink);
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.filterChip:hover {
+  border-color: var(--border-strong);
+}
+
+.filterChipActive {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+  font-weight: 500;
+}
+
+.filterClear {
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-family: var(--font-sans), serif;
+  font-size: 0.75rem;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.filterClear:hover {
+  color: var(--ink);
+  text-decoration: underline;
+}
+
+.empty {
+  padding: var(--space-8) var(--space-4);
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--muted-2);
 }
 
 /* Rung-grouped view */

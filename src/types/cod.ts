@@ -1,6 +1,6 @@
 /**
- * Types for the COD geometry server response (`POST /analyze/cif` and
- * `POST /analyze`). Both endpoints return this identical shape.
+ * Types for the COD geometry server response (`POST /analyse/cif` and
+ * `POST /analyse`). Both endpoints return this identical shape.
  *
  * See `data/sample-server-output/README.md` for the authoritative field notes.
  */
@@ -90,7 +90,7 @@ export interface AngleRecord extends GeometryRecord {
   atom_3: string
 }
 
-export interface AnalyzeResponse {
+export interface AnalyseResponse {
   format_version: number
   /** Ligand three/five-letter code, when the request supplied one. */
   comp_id?: string

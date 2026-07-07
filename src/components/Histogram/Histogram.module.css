@@ -55,6 +55,22 @@
   stroke-dasharray: 3 3;
 }
 
+/* Reference-population mean: a quiet solid guide behind the value marker. */
+.meanLine {
+  stroke: var(--muted);
+  stroke-width: 1;
+  stroke-opacity: 0.6;
+}
+
+.meanLabel {
+  fill: var(--muted);
+  font-family: var(--font-mono), serif;
+  font-size: 9px;
+  /* text-anchor is set inline so the label can flip to the mean line's clear
+     side, away from the value marker. */
+  dominant-baseline: hanging;
+}
+
 .markerChip {
   fill: currentColor;
 }

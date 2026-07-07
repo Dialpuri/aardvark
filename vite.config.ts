@@ -2,12 +2,12 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { fileURLToPath, URL } from 'node:url'
-import { mockAnalyze } from './vite/mockAnalyze.ts'
+import { mockAnalyse } from './vite/mockAnalyse.ts'
 
 // https://vite.dev/config/
 export default defineConfig({
   base: '/aardvark/',
-  plugins: [react(), mockAnalyze()],
+  plugins: [react(), mockAnalyse()],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
