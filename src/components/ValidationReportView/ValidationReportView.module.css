@@ -1,0 +1,25 @@
+.reportWrap {
+  max-width: 56rem;
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-8) var(--space-11);
+}
+
+.reportTitle {
+  font-size: 1.75rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  margin: 0 0 var(--space-2);
+}
+
+.note {
+  margin: 0 0 var(--space-6);
+  font-size: 0.9375rem;
+  color: var(--muted-2);
+}
+
+.status {
+  font-size: 0.875rem;
+  color: var(--muted-2);
+  text-align: center;
+  padding: var(--space-9);
+}
