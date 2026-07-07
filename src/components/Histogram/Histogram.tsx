@@ -207,21 +207,47 @@ export function Histogram(props: HistogramProps) {
       )}
       {layout.meanX !== null && (
         <g>
-          <line
+          <motion.line
             x1={layout.meanX}
             x2={layout.meanX}
             y1={M.top}
             y2={layout.baseline}
             className={styles.meanLine}
+            style={{ transformBox: 'fill-box', originY: 1 }}
+            initial={reduce ? false : { scaleY: 0, opacity: 0 }}
+            animate={{ scaleY: 1, opacity: 1 }}
+            transition={{
+              duration: 0.45,
+              delay: reduce ? 0 : 0.15,
+              ease: [0.16, 1, 0.3, 1],
+            }}
           />
-          <text
-            x={layout.meanX + (layout.meanLabelLeft ? -3 : 3)}
-            y={M.top + 1}
-            className={styles.meanLabel}
-            style={{ textAnchor: layout.meanLabelLeft ? 'end' : 'start' }}
+          <motion.g
+            initial={reduce ? false : { opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: 0.3,
+              delay: reduce ? 0 : 0.45,
+              ease: [0.16, 1, 0.3, 1],
+            }}
           >
-            μ
-          </text>
+            <text
+              x={layout.meanX + (layout.meanLabelLeft ? -3 : 3)}
+              y={M.top + 1}
+              className={styles.meanLabel}
+              style={{ textAnchor: layout.meanLabelLeft ? 'end' : 'start' }}
+            >
+              μ
+            </text>
+          </motion.g>
+          {/*<text*/}
+          {/*  x={layout.meanX + (layout.meanLabelLeft ? -3 : 3)}*/}
+          {/*  y={M.top + 1}*/}
+          {/*  className={styles.meanLabel}*/}
+          {/*  style={{ textAnchor: layout.meanLabelLeft ? 'end' : 'start' }}*/}
+          {/*>*/}
+          {/*  μ*/}
+          {/*</text>*/}
         </g>
       )}
 
