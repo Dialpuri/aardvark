@@ -1,5 +1,5 @@
-import { useId, useMemo } from 'react'
-import { motion, useReducedMotion } from 'framer-motion'
+import { useMemo, useState } from 'react'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { bin, extent, max } from 'd3-array'
 import { scaleLinear } from 'd3-scale'
 import styles from './Histogram.module.css'
@@ -18,6 +18,11 @@ interface CommonProps {
   value?: number
   /** Optional reference-population mean, drawn as a neutral guide line. */
   mean?: number
+  /**
+   * External hint to reveal the mean guide — e.g. while a "COD mean" figure
+   * above the chart is hovered.
+   */
+  meanHovered?: boolean
   /** Colour of the marker and the bin it falls in. */
   status?: HistogramStatus
   /** Fix the x-domain. Defaults to the span of the bins. */
@@ -55,7 +60,8 @@ const statusClass: Record<HistogramStatus, string> = {
 
 export function Histogram(props: HistogramProps) {
   const reduce = useReducedMotion()
-  const titleId = useId()
+  const [hoverBin, setHoverBin] = useState<number | null>(null)
+  const meanShown = props.meanHovered === true
 
   const layout = useMemo(() => {
     const width = props.width ?? DEFAULT_W
@@ -140,6 +146,10 @@ export function Histogram(props: HistogramProps) {
   ])
 
   const format = props.format ?? defaultFormat
+
+  // Accessible name for the chart. Carried on the <svg> via `aria-label` rather
+  // than a <title> child, since a <title> renders a native browser tooltip that
+  // would fight the per-bin hover tooltip below.
   const summary =
     props.label ??
     `Distribution of ${layout.n} values` +
@@ -147,16 +157,31 @@ export function Histogram(props: HistogramProps) {
         ? `; marker at ${format(props.value)}${props.unit ?? ''}`
         : '')
 
+  // Tooltip shown while a bar is hovered: how many observations fall in that bin.
+  const tip = (() => {
+    if (hoverBin === null) return null
+    const b = layout.boxes[hoverBin]
+    if (!b) return null
+    const label = `${b.count.toLocaleString()} obs`
+    const w = Math.max(38, label.length * 6 + 14)
+    const cx = Math.min(
+      Math.max((layout.x(b.x0) + layout.x(b.x1)) / 2, M.left + w / 2),
+      layout.right - w / 2,
+    )
+    const barTop = layout.y(b.count)
+    // Prefer sitting above the bar; drop below the bar's top if it would clip.
+    const y = barTop - 10 >= M.top + 12 ? barTop - 10 : barTop + 12
+    return { cx, y, w, label }
+  })()
+
   return (
     <svg
       viewBox={`0 0 ${layout.width} ${layout.height}`}
       className={`${styles.svg} ${props.className ?? ''}`}
       role="img"
-      aria-labelledby={titleId}
+      aria-label={summary}
       preserveAspectRatio="xMidYMid meet"
     >
-      <title id={titleId}>{summary}</title>
-
       {layout.boxes.map((b, i) => {
         const bx = layout.x(b.x0)
         const bw = Math.max(0, layout.x(b.x1) - bx - layout.gap)
@@ -170,7 +195,9 @@ export function Histogram(props: HistogramProps) {
             height={Math.max(0, layout.baseline - layout.y(b.count))}
             rx={2}
             className={`${styles.bar} ${hit ? statusClass[props.status ?? 'ok'] : ''}`}
-            style={{ transformBox: 'fill-box', originY: 1 }}
+            style={{ transformBox: 'fill-box', originY: 1, cursor: 'pointer' }}
+            onMouseEnter={() => setHoverBin(i)}
+            onMouseLeave={() => setHoverBin((h) => (h === i ? null : h))}
             initial={reduce ? false : { scaleY: 0 }}
             animate={{ scaleY: 1 }}
             transition={{
@@ -207,47 +234,45 @@ export function Histogram(props: HistogramProps) {
       )}
       {layout.meanX !== null && (
         <g>
-          <motion.line
-            x1={layout.meanX}
-            x2={layout.meanX}
-            y1={M.top}
-            y2={layout.baseline}
-            className={styles.meanLine}
-            style={{ transformBox: 'fill-box', originY: 1 }}
-            initial={reduce ? false : { scaleY: 0, opacity: 0 }}
-            animate={{ scaleY: 1, opacity: 1 }}
-            transition={{
-              duration: 0.45,
-              delay: reduce ? 0 : 0.15,
-              ease: [0.16, 1, 0.3, 1],
-            }}
-          />
-          <motion.g
-            initial={reduce ? false : { opacity: 0, y: -6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: 0.3,
-              delay: reduce ? 0 : 0.45,
-              ease: [0.16, 1, 0.3, 1],
-            }}
-          >
-            <text
-              x={layout.meanX + (layout.meanLabelLeft ? -3 : 3)}
-              y={M.top + 1}
-              className={styles.meanLabel}
-              style={{ textAnchor: layout.meanLabelLeft ? 'end' : 'start' }}
-            >
-              μ
-            </text>
-          </motion.g>
-          {/*<text*/}
-          {/*  x={layout.meanX + (layout.meanLabelLeft ? -3 : 3)}*/}
-          {/*  y={M.top + 1}*/}
-          {/*  className={styles.meanLabel}*/}
-          {/*  style={{ textAnchor: layout.meanLabelLeft ? 'end' : 'start' }}*/}
-          {/*>*/}
-          {/*  μ*/}
-          {/*</text>*/}
+          <AnimatePresence>
+            {meanShown && (
+              <motion.g
+                key="mean-guide"
+                initial={reduce ? false : { opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={reduce ? undefined : { opacity: 0 }}
+                transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                style={{ pointerEvents: 'none' }}
+              >
+                <motion.line
+                  x1={layout.meanX}
+                  x2={layout.meanX}
+                  y1={M.top}
+                  y2={layout.baseline}
+                  className={styles.meanLine}
+                  style={{ transformBox: 'fill-box', originY: 1 }}
+                  initial={reduce ? false : { scaleY: 0 }}
+                  animate={{ scaleY: 1 }}
+                  transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                />
+                <motion.text
+                  x={layout.meanX + (layout.meanLabelLeft ? -3 : 3)}
+                  y={M.top + 1}
+                  className={styles.meanLabel}
+                  style={{ textAnchor: layout.meanLabelLeft ? 'end' : 'start' }}
+                  initial={reduce ? false : { opacity: 0, y: -6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    duration: 0.3,
+                    delay: reduce ? 0 : 0.15,
+                    ease: [0.16, 1, 0.3, 1],
+                  }}
+                >
+                  μ
+                </motion.text>
+              </motion.g>
+            )}
+          </AnimatePresence>
         </g>
       )}
 
@@ -294,6 +319,31 @@ export function Histogram(props: HistogramProps) {
           </g>
         </g>
       )}
+
+      <AnimatePresence>
+        {tip && (
+          <motion.g
+            key={hoverBin}
+            initial={reduce ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={reduce ? undefined : { opacity: 0 }}
+            transition={{ duration: 0.12, ease: 'easeOut' }}
+            style={{ pointerEvents: 'none' }}
+          >
+            <g transform={`translate(${tip.cx}, ${tip.y})`}>
+              <rect
+                x={-tip.w / 2}
+                y={-9}
+                width={tip.w}
+                height={18}
+                rx={5}
+                className={styles.binTip}
+              />
+              <text className={styles.binTipLabel}>{tip.label}</text>
+            </g>
+          </motion.g>
+        )}
+      </AnimatePresence>
     </svg>
   )
 }
