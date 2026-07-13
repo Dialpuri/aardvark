@@ -513,6 +513,11 @@
   font-family: var(--font-sans), serif;
 }
 
+.figures .underline {
+  border-bottom: 1px dotted var(--border-strong);
+  font-family: var(--font-sans), serif;
+}
+
 .noReference {
   margin: 0;
   font-size: 0.84375rem;

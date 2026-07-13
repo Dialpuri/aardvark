@@ -327,6 +327,7 @@ interface GeometryRowProps {
 function GeometryRow(props: GeometryRowProps) {
   const [open, setOpen] = useState(props.defaultOpen)
   const [obsOpen, setObsOpen] = useState(false)
+  const [meanHover, setMeanHover] = useState(false)
   const record = props.record
   const cfg = KINDS[props.kind]
   const status = outlierStatus(record)
@@ -392,9 +393,12 @@ function GeometryRow(props: GeometryRowProps) {
               {reference ? (
                 <>
                   <dl className={styles.figures}>
-                    <div>
+                    <div
+                      onMouseEnter={() => setMeanHover(true)}
+                      onMouseLeave={() => setMeanHover(false)}
+                    >
                       <dt>COD mean</dt>
-                      <dd>
+                      <dd className={styles.underline}>
                         {cfg.format(record.mean!)}
                         {cfg.unit} ± {cfg.format(record.sd!)}
                       </dd>
@@ -418,11 +422,12 @@ function GeometryRow(props: GeometryRowProps) {
                     bins={histogramBins(record.histogram)}
                     value={record.value}
                     mean={record.mean ?? undefined}
+                    meanHovered={meanHover}
                     status={status as HistogramStatus}
                     unit={cfg.unit.trim()}
                     format={cfg.format}
                     axisLabel={cfg.axisLabel}
-                    label={`${geometryLabel(record)} vs. ${record.N} COD observations`}
+                    // label={`${geometryLabel(record)} vs. ${record.N} COD observations`}
                   />
                 </>
               ) : (
