@@ -4,7 +4,6 @@ import { staggerContainer } from '@/lib/motion'
 import {
   byAbsoluteDeviation,
   byOutlierSeverity,
-  cleanDepictionSvg,
   RUNG_ORDER,
   geometryLabel,
   hasReference,
@@ -15,6 +14,7 @@ import {
   rungLabel,
 } from '@/lib/cod'
 import type { AngleRecord, AnalyseResponse, BondRecord } from '@/types/cod'
+import { LigandViewer } from '@/components/LigandViewer'
 import { KINDS, type Kind } from './kinds'
 import { GeometryRow } from './GeometryRow'
 import { ElementFilter } from './ElementFilter'
@@ -82,13 +82,7 @@ export function ValidationReport(props: ValidationReportProps) {
     <div className={styles.report}>
       <div className={styles.summary}>
         <div className={styles.summaryId}>
-          {depiction && (
-            <span
-              className={styles.summaryThumb}
-              aria-hidden
-              dangerouslySetInnerHTML={{ __html: cleanDepictionSvg(depiction) }}
-            />
-          )}
+          <LigandViewer report={props.report} depiction={depiction} />
           <div>
             <span className={styles.ligand}>
               {props.report.comp_id ?? 'ligand'}

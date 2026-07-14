@@ -1,0 +1,160 @@
+/* Clickable thumbnail — matches the old .summaryThumb footprint. */
+.thumb {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3rem;
+  flex-shrink: 0;
+  padding: 0;
+  border-radius: var(--radius-sm);
+  background: var(--card);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.thumb:hover {
+  border-color: var(--border-strong);
+  box-shadow: 0 1px 3px rgba(16, 32, 48, 0.1);
+}
+
+.thumb:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 1px;
+}
+
+.thumbSvg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.thumbSvg svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.thumbFallback {
+  font-family: var(--font-mono), serif;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+/* Expand affordance, tucked in the corner. */
+.thumbHint {
+  position: absolute;
+  right: 2px;
+  bottom: 1px;
+  font-size: 0.625rem;
+  line-height: 1;
+  color: var(--faint);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.thumb:hover .thumbHint,
+.thumb:focus-visible .thumbHint {
+  opacity: 1;
+}
+
+/* Modal */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  background: rgba(16, 32, 48, 0.45);
+  backdrop-filter: blur(2px);
+}
+
+.dialog {
+  display: flex;
+  flex-direction: column;
+  width: min(90vw, 640px);
+  border-radius: var(--radius);
+  background: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: 0 12px 40px rgba(16, 32, 48, 0.25);
+  overflow: hidden;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border);
+}
+
+.title {
+  font-family: var(--font-mono), serif;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.close:hover {
+  background: var(--subtle);
+  color: var(--ink);
+}
+
+.close:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 1px;
+}
+
+/* Fixed-size stage so the WebGL canvas has real dimensions to size against. */
+.body {
+  position: relative;
+  width: 100%;
+  height: min(70vh, 460px);
+  background: var(--subtle);
+}
+
+.message {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  color: var(--muted-2);
+}
+
+.hint {
+  margin: 0;
+  padding: var(--space-2) var(--space-4);
+  border-top: 1px solid var(--border);
+  font-size: 0.6875rem;
+  color: var(--faint);
+  text-align: center;
+}

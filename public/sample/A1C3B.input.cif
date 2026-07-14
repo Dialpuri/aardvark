@@ -1,65 +1,14 @@
-data_A1C3B
-_chem_comp.id A1C3B
-_chem_comp.name "[(3-bromo-5-carbamoyl-1-benzothiophen-2-yl)di(fluoro)methyl]phosphonic acid"
-_chem_comp.type non-polymer
-_chem_comp.pdbx_type HETAIN
-_chem_comp.formula "C10 H7 Br F2 N O4 P S"
-_chem_comp.mon_nstd_parent_comp_id ?
-_chem_comp.pdbx_synonyms ?
-_chem_comp.pdbx_formal_charge 0
-_chem_comp.pdbx_initial_date 2025-12-11
-_chem_comp.pdbx_modified_date 2026-05-22
-_chem_comp.pdbx_ambiguous_flag N
-_chem_comp.pdbx_release_status REL
-_chem_comp.pdbx_replaced_by ?
-_chem_comp.pdbx_replaces ?
-_chem_comp.formula_weight 386.106
-_chem_comp.one_letter_code ?
-_chem_comp.three_letter_code A1C3B
-_chem_comp.pdbx_model_coordinates_details ?
-_chem_comp.pdbx_model_coordinates_missing_flag N
-_chem_comp.pdbx_ideal_coordinates_details Corina
-_chem_comp.pdbx_ideal_coordinates_missing_flag N
-_chem_comp.pdbx_model_coordinates_db_code 9ZMF
-_chem_comp.pdbx_subcomponent_list ?
-_chem_comp.pdbx_processing_site RCSB
-_chem_comp.pdbx_pcm ?
 
-loop_
-_chem_comp_atom.comp_id
-_chem_comp_atom.atom_id
-_chem_comp_atom.type_symbol
-_chem_comp_atom.type_energy
-_chem_comp_atom.charge
-_chem_comp_atom.atom_type
-_chem_comp_atom.pdbx_model_Cartn_x_ideal
-_chem_comp_atom.pdbx_model_Cartn_y_ideal
-_chem_comp_atom.pdbx_model_Cartn_z_ideal
-A1C3B C10 C CT 0 C(C[5a]C[5a]S[5a])(PO3)(F)2 -4.62942299 -2.22390478 0.74563458
-A1C3B C01 C CR6 0 C[6a](C[6a]C[5a,6a]H)(C[6a]C[6a]H)(CNO){1|H<1>,2|C<3>} -4.2479665 -1.22177598 0.715082888
-A1C3B C02 C CR16 0 C[6a](C[6a]C[5a,6a]H)(C[6a]C[6a]C)(H){1|C<3>,1|H<1>,1|S<2>} -3.0068096 -1.94296009 0.626952131
-A1C3B C03 C CR16 0 C[6a](C[5a,6a]C[5a,6a]S[5a])(C[6a]C[6a]H)(H){4|C<3>} -1.84767027 -1.38020128 0.0567666298
-A1C3B C04 C CR56 0 C[5a,6a](C[5a,6a]C[5a]C[6a])(C[6a]C[6a]H)(S[5a]C[5a]){1|Br<1>,1|C<3>,1|C<4>,2|H<1>} -2.25379563 -0.159376059 -0.417816468
-A1C3B C05 C CR56 0 C[5a,6a](C[5a,6a]C[6a]S[5a])(C[5a]C[5a]Br)(C[6a]C[6a]H){1|C<4>,1|H<1>,2|C<3>} -2.83493849 0.337880547 0.727612379
-A1C3B C06 C CR16 0 C[6a](C[5a,6a]C[5a,6a]C[5a])(C[6a]C[6a]C)(H){1|Br<1>,1|H<1>,1|S<2>,2|C<3>} -4.18075301 0.186090404 0.800684862
-A1C3B C07 C CR5 0 C[5a](C[5a,6a]C[5a,6a]C[6a])(C[5a]S[5a]C)(Br){1|H<1>,2|C<3>} -2.3366115 -0.997922487 0.79012874
-A1C3B C08 C CR5 0 C[5a](C[5a]C[5a,6a]Br)(S[5a]C[5a,6a])(CFFP){2|C<3>} -3.44147254 -1.53634243 0.136616138
-A1C3B S09 S S2 0 S[5a](C[5a,6a]C[5a,6a]C[6a])(C[5a]C[5a]C){1|Br<1>,1|H<1>,2|C<3>} -3.66476965 -0.523120505 -1.27172211
-A1C3B P11 P P 0 P(CC[5a]FF)(O)3 -5.44907959 -3.36094481 -0.408155899
-A1C3B O12 O OP -1 O(PCOO) -4.37131311 -4.23721294 -1.03362871
-A1C3B O13 O O 0 O(PCOO) -6.15707506 -2.51664412 -1.46010121
-A1C3B O14 O OP -1 O(PCOO) -6.44142476 -4.19149077 0.395747151
-A1C3B F15 F F 0 F(CC[5a]FP) -5.54807652 -1.30948861 1.16346219
-A1C3B F16 F F 0 F(CC[5a]FP) -4.25992423 -2.93138368 1.84903118
-A1C3B BR1 Br BR 0 Br(C[5a]C[5a,6a]C[5a]) -1.52637292 -1.76182018 2.28571816
-A1C3B C18 C C 0 C(C[6a]C[6a]2)(NHH)(O) -5.48620597 -1.86748545 0.186639305
-A1C3B O19 O O 0 O(CC[6a]N) -6.59866542 -1.42520909 0.508171024
-A1C3B N20 N NH2 0 N(CC[6a]O)(H)2 -5.35655189 -2.88574105 -0.654487422
-A1C3B H1 H H 0 H(C[6a]C[6a]2) -2.96698327 -2.81964355 0.960959579
-A1C3B H2 H H 0 H(C[6a]C[5a,6a]C[6a]) -0.984585891 -1.76049824 0.0123456727
-A1C3B H3 H H 0 H(C[6a]C[5a,6a]C[6a]) -4.86585123 0.825962278 0.883592217
-A1C3B H6 H H 0 H(NCH) -6.0778902 -3.28749874 -0.983466517
-A1C3B H7 H H 0 H(NCH) -4.54800731 -3.16886939 -0.891256194
+data_A1C3B
+
+_database.entry_id      A1C3B
+_database.code_NDB      A1C3B
+_database.code_PDB      A1C3B
+_database.date_original ?
+
+_struct_keywords.ndb_keywords ?
+
+_refine.ls_d_res_high ?
 
 loop_
 _chem_comp_bond.comp_id

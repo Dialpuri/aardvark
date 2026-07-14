@@ -96,4 +96,10 @@ export interface AnalyseResponse {
   comp_id?: string
   bonds: BondRecord[]
   angles: AngleRecord[]
+  /**
+   * Raw coordinate-file text (mmCIF/PDB) for the ligand, fed to the 3D viewer.
+   * Not yet emitted by the server — a bundled mock stands in for now, see
+   * `loadReportCoordinates` in `@/lib/coordinates`.
+   */
+  coordinates?: string
 }

@@ -20,6 +20,9 @@ importers:
       framer-motion:
         specifier: ^12.42.0
         version: 12.42.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      gemmimol:
+        specifier: ^0.8.8
+        version: 0.8.8
       react:
         specifier: ^19.2.7
         version: 19.2.7
@@ -743,6 +746,10 @@ packages:
     resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
     os: [darwin]
+
+  gemmimol@0.8.8:
+    resolution: {integrity: sha512-A5Ub4k39ofUa5fh+h317EfKssvGUX0gwuw6mH5fhXGLAuwVHD/45MWTdmkerNJBmMdPa5i9VP+mwy0yKrxckSA==}
+    engines: {node: '>=20'}
 
   get-east-asian-width@1.6.0:
     resolution: {integrity: sha512-QRbvDIbx6YklUe6RxeTeleMR0yv3cYH6PsPZHcnVn7xv7zO1BHN8r0XETu8n6Ye3Q+ahtSarc3WgtNWmehIBfA==}
@@ -1787,6 +1794,8 @@ snapshots:
 
   fsevents@2.3.3:
     optional: true
+
+  gemmimol@0.8.8: {}
 
   get-east-asian-width@1.6.0: {}
 

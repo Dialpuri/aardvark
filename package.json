@@ -4,9 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "preview": "vite preview",
+    "copy-wasm": "node scripts/copy-gemmi-wasm.mjs",
+    "dev": "pnpm copy-wasm && vite",
+    "build": "pnpm copy-wasm && tsc -b && vite build",
+    "preview": "pnpm copy-wasm && vite preview",
     "lint": "oxlint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -21,6 +22,7 @@
     "d3-array": "^3.2.4",
     "d3-scale": "^4.0.2",
     "framer-motion": "^12.42.0",
+    "gemmimol": "^0.8.8",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-router-dom": "^7.18.0"

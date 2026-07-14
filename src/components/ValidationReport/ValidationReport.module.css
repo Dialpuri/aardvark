@@ -22,24 +22,6 @@
   gap: var(--space-4);
 }
 
-.summaryThumb {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 3.5rem;
-  height: 3rem;
-  flex-shrink: 0;
-  border-radius: var(--radius-sm);
-  background: var(--card);
-  border: 1px solid var(--border);
-}
-
-.summaryThumb svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
 .ligand {
   font-family: var(--font-mono), serif;
   font-size: 1rem;

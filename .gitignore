@@ -13,6 +13,9 @@ dist-ssr
 coverage
 *.local
 
+# Copied from gemmimol at dev/build time by scripts/copy-gemmi-wasm.mjs
+public/gemmi/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
