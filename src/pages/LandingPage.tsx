@@ -38,10 +38,10 @@ export default function LandingPage() {
         <a href={'#how-it-works'} className={styles.navLink}>
           How it works
         </a>
-        <a className={styles.navLink}>Reference data</a>
-        <a className={styles.navLink}>About</a>
+        {/*<a className={styles.navLink}>Reference data</a>*/}
+        {/*<a className={styles.navLink}>About</a>*/}
         <Button to="/validate" size="md">
-          Validate a structure
+          Validate a ligand
         </Button>
       </Navbar>
 
@@ -55,19 +55,19 @@ export default function LandingPage() {
         >
           <Badge dot="#1f8f5f">Free | Open Source · Easy to use </Badge>
           <h1 className={styles.title}>
-            Is your ligand dictionary
+            Is your ligand
             <br />
             actually plausible?
           </h1>
           <p className={styles.lede}>
-            AARDVARK checks every bond length and angle in your dictionary
-            against the distributions seen across thousands of known molecules
-            in the Crystallography Open Density, so you can be confident in your
-            structure determination.
+            AARDVARK checks every bond length and angle in your ligand model or
+            dictionary against the distributions seen across thousands of known
+            molecules in the Crystallography Open Density, so you can be
+            confident in your structure determination.
           </p>
           <div className={styles.heroActions}>
             <Button to="/validate" size="lg">
-              Validate a structure →
+              Validate a ligand →
             </Button>
             <Button to="/validate?sample" size="lg" variant="secondary">
               See a sample report

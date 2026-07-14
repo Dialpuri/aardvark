@@ -17,7 +17,7 @@ const OPTIONS: PathOption[] = [
     mode: 'dictionary',
     title: 'A dictionary',
     tagline: 'idealised geometry',
-    body: 'Check the target geometry in a restraints dictionary. Provide an ACEDRG dictionary directly, or a SMILES / InChI and we build one on the server first.',
+    body: 'Check the target geometry in a restraints dictionary. Provide an restraint dictionary directly (AceDRG, ELBOW, Grade), or a SMILES / InChI and we build one on the server first.',
     accepts: 'dictionary CIF · SMILES · InChI',
   },
   {
