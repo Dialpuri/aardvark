@@ -1,4 +1,4 @@
-# AARDVARK - Acedrg atom-type reference data and validation kit
+# AARDVARK - Acedrg atom-type reference data validation and reporting kit
 
 ## Stack
 
