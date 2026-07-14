@@ -12,6 +12,9 @@ import type { Plugin } from 'vite'
  * client's spawn → track → collect path end to end. Swap in the real server by
  * setting `VITE_AARDVARK_PROXY` (see `vite.config.ts`).
  *
+ * The `run_aardvark` body now also carries `mode` (`dictionary` | `model`) and an
+ * optional `comp_id`; the mock ignores both and only reads the `data` directive.
+ *
  * To exercise the unhappy paths, put a directive in the input structure text
  * (the SMILES box, etc.); it's decoded from the request and matched
  * case-insensitively. Directives take an optional `=N` argument:

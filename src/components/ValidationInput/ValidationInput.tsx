@@ -3,6 +3,7 @@ import { Button } from '@/components/Button'
 import {
   formatFromFilename,
   wrapInput,
+  type AnalyseMode,
   type AnalyseRequest,
 } from '@/lib/analyse'
 import styles from './ValidationInput.module.css'
@@ -64,7 +65,44 @@ const TEXT_TABS: TextTabConfig[] = [
   },
 ]
 
-const FILE_ACCEPT = '.cif,.mol,.sdf,.mol2,.pdb,.ent'
+/** Per-mode configuration of the file dropzone (accepted files + labels). */
+interface FileTabConfig {
+  /** Label on the file tab (dictionary mode) / not shown in model mode. */
+  tabLabel: string
+  /** `accept` attribute for the dropzone file input. */
+  accept: string
+  /** The dropzone's prompt, e.g. `<code>.cif</code>` snippets. */
+  hint: React.ReactNode
+}
+
+const FILE_TABS: Record<AnalyseMode, FileTabConfig> = {
+  dictionary: {
+    tabLabel: 'Dictionary file',
+    accept: '.cif',
+    hint: (
+      <>
+        Drop a restraints <code>.cif</code> dictionary
+      </>
+    ),
+  },
+  model: {
+    tabLabel: 'Molecule file',
+    accept: '.cif,.mmcif,.pdb,.ent,.mol,.sdf,.mol2',
+    hint: (
+      <>
+        Drop a <code>.pdb</code> / <code>.cif</code> / <code>.mol</code> file
+      </>
+    ),
+  },
+}
+
+/**
+ * Model-path formats that describe a whole structure and so need a `comp_id` to
+ * pick out the ligand. Single-ligand formats (MOL/SDF) don't.
+ */
+function needsCompId(format: ReturnType<typeof formatFromFilename>): boolean {
+  return format === 'pdb' || format === 'cif'
+}
 
 // .smi / .inchi files hold one entry per line, optionally followed by a name or
 // extra columns. Take the first token of the first non-empty line.
@@ -82,11 +120,18 @@ function seedByFormat<T>(value: T): Record<TextFormat, T> {
 }
 
 interface ValidationInputProps {
+  mode: AnalyseMode
   onSubmit: (request: AnalyseRequest) => void
 }
 
 export function ValidationInput(props: ValidationInputProps) {
-  const [tab, setTab] = useState<Tab>('smiles')
+  // Dictionary path offers typed SMILES/InChI as well as a file; the model path
+  // is file-only (plus a ligand code), so it opens straight on the dropzone.
+  const textTabs = props.mode === 'dictionary' ? TEXT_TABS : []
+  const fileTab = FILE_TABS[props.mode]
+  const [tab, setTab] = useState<Tab>(
+    props.mode === 'dictionary' ? 'smiles' : 'file',
+  )
   const [text, setText] = useState<Record<TextFormat, string>>({
     smiles: TEXT_TABS[0].initial,
     inchi: TEXT_TABS[1].initial,
@@ -95,6 +140,7 @@ export function ValidationInput(props: ValidationInputProps) {
     Record<TextFormat, string | null>
   >(seedByFormat(null))
   const [file, setFile] = useState<File | null>(null)
+  const [compId, setCompId] = useState('')
   const fileInput = useRef<HTMLInputElement>(null)
   const textFileInput = useRef<HTMLInputElement>(null)
 
@@ -113,45 +159,57 @@ export function ValidationInput(props: ValidationInputProps) {
   }
 
   // The visible text-tab config, or null while the file tab is active.
-  const activeText = TEXT_TABS.find((c) => c.format === tab) ?? null
+  const activeText = textTabs.find((c) => c.format === tab) ?? null
   const fileFormat = file ? formatFromFilename(file.name) : null
+  const compIdRequired = props.mode === 'model' && needsCompId(fileFormat)
   const canSubmit = activeText
     ? text[activeText.format].trim() !== ''
-    : fileFormat !== null
+    : fileFormat !== null && (!compIdRequired || compId.trim() !== '')
 
   async function submit() {
     if (activeText) {
       const value = text[activeText.format].trim()
-      if (value !== '') props.onSubmit(wrapInput(activeText.format, value))
+      if (value !== '')
+        props.onSubmit(wrapInput(props.mode, activeText.format, value))
       return
     }
     if (!file || fileFormat === null) return
-    props.onSubmit(wrapInput(fileFormat, await file.text()))
+    if (compIdRequired && compId.trim() === '') return
+    props.onSubmit(
+      wrapInput(
+        props.mode,
+        fileFormat,
+        await file.text(),
+        compId.trim() || undefined,
+      ),
+    )
   }
 
   return (
     <div className={styles.panel}>
-      <div className={styles.tabs} role="tablist">
-        {TEXT_TABS.map((t) => (
+      {textTabs.length > 0 && (
+        <div className={styles.tabs} role="tablist">
+          {textTabs.map((t) => (
+            <button
+              key={t.format}
+              role="tab"
+              aria-selected={tab === t.format}
+              className={`${styles.tab} ${tab === t.format ? styles.tabActive : ''}`}
+              onClick={() => setTab(t.format)}
+            >
+              {t.tabLabel}
+            </button>
+          ))}
           <button
-            key={t.format}
             role="tab"
-            aria-selected={tab === t.format}
-            className={`${styles.tab} ${tab === t.format ? styles.tabActive : ''}`}
-            onClick={() => setTab(t.format)}
+            aria-selected={tab === 'file'}
+            className={`${styles.tab} ${tab === 'file' ? styles.tabActive : ''}`}
+            onClick={() => setTab('file')}
           >
-            {t.tabLabel}
+            {fileTab.tabLabel}
           </button>
-        ))}
-        <button
-          role="tab"
-          aria-selected={tab === 'file'}
-          className={`${styles.tab} ${tab === 'file' ? styles.tabActive : ''}`}
-          onClick={() => setTab('file')}
-        >
-          Molecule file
-        </button>
-      </div>
+        </div>
+      )}
 
       <div className={styles.body}>
         {activeText ? (
@@ -216,46 +274,61 @@ export function ValidationInput(props: ValidationInputProps) {
             </div>
           </>
         ) : (
-          <div
-            className={styles.dropzone}
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={(e) => {
-              e.preventDefault()
-              setFile(e.dataTransfer.files?.[0] ?? null)
-            }}
-          >
-            <input
-              ref={fileInput}
-              type="file"
-              accept={FILE_ACCEPT}
-              className={styles.fileInput}
-              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-            />
-            <span className={styles.dropIcon} />
-            {file ? (
-              <div className={styles.dropTitle}>
-                {file.name}
-                {fileFormat === null && (
-                  <span className={styles.fileError}>
-                    {' '}
-                    — unsupported file type
-                  </span>
-                )}
-              </div>
-            ) : (
-              <div className={styles.dropTitle}>
-                Drop a <code>.cif</code> / <code>.mol</code> / <code>.pdb</code>{' '}
-                file
-              </div>
-            )}
-            <div className={styles.dropOr}>or</div>
-            <Button
-              variant="secondary"
-              onClick={() => fileInput.current?.click()}
+          <>
+            <div
+              className={styles.dropzone}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => {
+                e.preventDefault()
+                setFile(e.dataTransfer.files?.[0] ?? null)
+              }}
             >
-              Browse files
-            </Button>
-          </div>
+              <input
+                ref={fileInput}
+                type="file"
+                accept={fileTab.accept}
+                className={styles.fileInput}
+                onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+              />
+              <span className={styles.dropIcon} />
+              {file ? (
+                <div className={styles.dropTitle}>
+                  {file.name}
+                  {fileFormat === null && (
+                    <span className={styles.fileError}>
+                      {' '}
+                      — unsupported file type
+                    </span>
+                  )}
+                </div>
+              ) : (
+                <div className={styles.dropTitle}>{fileTab.hint}</div>
+              )}
+              <div className={styles.dropOr}>or</div>
+              <Button
+                variant="secondary"
+                onClick={() => fileInput.current?.click()}
+              >
+                Browse files
+              </Button>
+            </div>
+
+            {props.mode === 'model' && (
+              <label className={styles.compId}>
+                <span className={styles.compIdLabel}>
+                  Ligand code
+                  {compIdRequired ? '' : ' (optional)'}
+                </span>
+                <input
+                  className={styles.compIdInput}
+                  value={compId}
+                  spellCheck={false}
+                  placeholder="e.g. A1C3B"
+                  onChange={(e) => setCompId(e.target.value)}
+                />
+              </label>
+            )}
+          </>
         )}
 
         <button

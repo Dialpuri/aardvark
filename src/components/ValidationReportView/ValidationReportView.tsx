@@ -60,19 +60,22 @@ export function ValidationReportView(props: ValidationReportViewProps) {
       initial="hidden"
       animate="visible"
     >
-      {report.isPending ? (
-        <JobStatus progress={progress} />
-      ) : report.isError ? (
-        <JobError error={report.error} onRetry={() => report.refetch()} />
-      ) : (
+      {report.isSuccess ? (
         <>
           <h1 className={styles.reportTitle}>Geometry report</h1>
           <p className={styles.note}>
-            Every bond and angle is scored against the COD reference
-            distribution for that given chemical environment.
+            {props.request?.mode === 'model'
+              ? 'Every observed bond and angle is scored against the COD reference distribution for that given chemical environment.'
+              : 'Every idealised bond and angle is scored against the COD reference distribution for that given chemical environment.'}
           </p>
           <ValidationReport report={report.data} />
         </>
+      ) : report.isError && !report.isFetching ? (
+        <JobError error={report.error} onRetry={() => report.refetch()} />
+      ) : (
+        // Initial load, or a retry in flight (`isError` still true but
+        // re-fetching) — show the waiting state so a retry is visible.
+        <JobStatus progress={progress} />
       )}
     </motion.div>
   )

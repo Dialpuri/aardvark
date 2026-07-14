@@ -2,14 +2,30 @@ import { useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Navbar } from '@/components/Navbar'
+import { PathChooser } from '@/components/PathChooser'
 import { ValidationInput } from '@/components/ValidationInput'
 import { ValidationReportView } from '@/components/ValidationReportView'
 import { floatIn } from '@/lib/motion'
-import type { AnalyseRequest } from '@/lib/analyse'
+import type { AnalyseMode, AnalyseRequest } from '@/lib/analyse'
 import styles from './ValidatePage.module.css'
+
+/** Page heading + blurb for each path's input step. */
+const MODE_COPY: Record<AnalyseMode, { title: string; subtitle: string }> = {
+  dictionary: {
+    title: 'Validate a dictionary',
+    subtitle:
+      'Paste a SMILES / InChI string or upload a restraints dictionary. An ACEDRG dictionary is created (if needed) and its target geometry is scored against the COD reference server.',
+  },
+  model: {
+    title: 'Validate a model or ligand',
+    subtitle:
+      'Upload a coordinate model naming a ligand, or a standalone ligand file. The geometry as built is measured and scored against the COD reference server.',
+  },
+}
 
 export default function ValidatePage() {
   const [searchParams, setSearchParams] = useSearchParams()
+  const [mode, setMode] = useState<AnalyseMode | null>(null)
   const [request, setRequest] = useState<AnalyseRequest | null>(null)
 
   // `/validate?sample` (linked from the landing page) opens straight into the
@@ -38,12 +54,20 @@ export default function ValidatePage() {
     )
   }
 
+  const copy = mode ? MODE_COPY[mode] : null
+
   return (
     <div>
       <Navbar>
-        <Link to="/" className={styles.back}>
-          ← Back
-        </Link>
+        {mode ? (
+          <button className={styles.backButton} onClick={() => setMode(null)}>
+            ← Choose a different check
+          </button>
+        ) : (
+          <Link to="/" className={styles.back}>
+            ← Back
+          </Link>
+        )}
       </Navbar>
 
       <motion.div
@@ -52,22 +76,28 @@ export default function ValidatePage() {
         initial="hidden"
         animate="visible"
       >
-        <h1 className={styles.title}>Validate a structure with ACEDRG</h1>
-        <p className={styles.subtitle}>
-          Paste a SMILES string or upload a ligand coordinate file. An ACEDRG
-          dictionary is created and scored against the COD reference geometry
-          server.
-        </p>
-
-        <ValidationInput onSubmit={setRequest} />
-
-        <p className={styles.privacy}>
-          Your structure is sent to a server over an encrypted connection, an
-          ACEDRG dictionary is created and scored against the COD reference
-          distributions. Your data is not stored on the server, but if you are
-          concerned about privacy you can host your own server, see{' '}
-          <a href={''}>here</a>.
-        </p>
+        {copy ? (
+          <>
+            <h1 className={styles.title}>{copy.title}</h1>
+            <p className={styles.subtitle}>{copy.subtitle}</p>
+            <ValidationInput mode={mode!} onSubmit={setRequest} />
+            <p className={styles.privacy}>
+              Your structure is sent to a server over an encrypted connection
+              and scored against the COD reference distributions. Your data is
+              not stored on the server, but if you are concerned about privacy
+              you can host your own server, see <a href={''}>here</a>.
+            </p>
+          </>
+        ) : (
+          <>
+            <h1 className={styles.title}>What would you like to validate?</h1>
+            <p className={styles.subtitle}>
+              Check either the idealised geometry in a dictionary, or the
+              geometry as actually built in a model or ligand.
+            </p>
+            <PathChooser onChoose={setMode} />
+          </>
+        )}
       </motion.div>
     </div>
   )

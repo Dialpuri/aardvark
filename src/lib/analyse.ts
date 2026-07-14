@@ -4,14 +4,25 @@ import type { AnalyseResponse } from '@/types/cod'
 export type InputFormat = 'smiles' | 'inchi' | 'cif' | 'mol' | 'pdb'
 
 /**
+ * Which of the two validation paths a request follows:
+ * - `dictionary` — validate *idealised* restraint geometry (an ACEDRG/restraints
+ *   dictionary, or a SMILES/InChI the server runs ACEDRG on first).
+ * - `model` — validate *observed* geometry measured from real coordinates (a
+ *   PDB/mmCIF model naming a ligand, or a standalone ligand coordinate file).
+ */
+export type AnalyseMode = 'dictionary' | 'model'
+
+/**
  * A structure to run through Aardvark: the raw text plus a tag telling the
  * server how to read it, and an optional ligand code. The text is base64
  * encoded before it goes on the wire (see {@link spawnJob}).
  */
 export interface AnalyseRequest {
+  mode: AnalyseMode
   format: InputFormat
   /** SMILES / InChI string, or the full text of a CIF / MOL / PDB file. */
   data: string
+  /** Which ligand to validate — `model` path only (names the residue in a model). */
   comp_id?: string
 }
 
@@ -78,6 +89,7 @@ export function formatFromFilename(name: string): InputFormat | null {
   const ext = name.split('.').pop()?.toLowerCase()
   switch (ext) {
     case 'cif':
+    case 'mmcif':
       return 'cif'
     case 'mol':
     case 'sdf':
@@ -92,8 +104,13 @@ export function formatFromFilename(name: string): InputFormat | null {
 }
 
 /** Build the request the caller hands on for analysis from raw structure text. */
-export function wrapInput(format: InputFormat, data: string): AnalyseRequest {
-  return { format, data }
+export function wrapInput(
+  mode: AnalyseMode,
+  format: InputFormat,
+  data: string,
+  comp_id?: string,
+): AnalyseRequest {
+  return { mode, format, data, comp_id }
 }
 
 /** UTF-8 → base64, the encoding `POST /run_aardvark` expects for `data`. */
@@ -138,7 +155,12 @@ async function spawnJob(input: AnalyseRequest): Promise<AardvarkJob> {
   const res = await fetch(`${AARDVARK_BASE}/run_aardvark`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ format: input.format, data: toBase64(input.data) }),
+    body: JSON.stringify({
+      mode: input.mode,
+      format: input.format,
+      data: toBase64(input.data),
+      comp_id: input.comp_id,
+    }),
   })
 
   const body = (await res
