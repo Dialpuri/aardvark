@@ -16,8 +16,10 @@ export interface AnalyseRequest {
 }
 
 /**
- * Base URL of the Aardvark job server. Overridable at build time with
- * `VITE_AARDVARK_URL`; defaults to the dev mock server (see `vite/mockAardvark`).
+ * Base URL of the Aardvark job server. Defaults to the same-origin `/api` path,
+ * which in dev is either served by the mock or proxied to a real backend (see
+ * `vite.config.ts`). Set `VITE_AARDVARK_URL` to hit a server on another origin
+ * directly (that server must send CORS headers).
  */
 export const AARDVARK_BASE: string = import.meta.env.VITE_AARDVARK_URL ?? '/api'
 
@@ -109,6 +111,21 @@ function jobSocketUrl(jobId: string): string {
   return url.toString()
 }
 
+/**
+ * Thrown when a job runs but reports `Failed` (as opposed to never starting or
+ * losing its connection). Lets callers tell a genuine job failure apart from an
+ * unreachable server, e.g. to show the error rather than fall back to a sample.
+ */
+export class JobFailedError extends Error {
+  /** The server's reason for the failure, when it gave one. */
+  readonly reason: FailureReason | null
+  constructor(message: string, reason: FailureReason | null = null) {
+    super(message)
+    this.name = 'JobFailedError'
+    this.reason = reason
+  }
+}
+
 /** Best-effort human-readable message for a failed job. */
 function jobFailureMessage(progress: JobProgress): string {
   if (progress.error_message) return progress.error_message
@@ -165,7 +182,14 @@ function trackJob(
       onProgress?.(progress)
       if (progress.status === 'Finished') finish(resolve)
       else if (progress.status === 'Failed')
-        finish(() => reject(new Error(jobFailureMessage(progress))))
+        finish(() =>
+          reject(
+            new JobFailedError(
+              jobFailureMessage(progress),
+              progress.failure_reason,
+            ),
+          ),
+        )
     }
 
     // The server closes the socket when the job completes; if that happens

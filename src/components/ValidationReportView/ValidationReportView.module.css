@@ -16,10 +16,3 @@
   font-size: 0.9375rem;
   color: var(--muted-2);
 }
-
-.status {
-  font-size: 0.875rem;
-  color: var(--muted-2);
-  text-align: center;
-  padding: var(--space-9);
-}

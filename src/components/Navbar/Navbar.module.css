@@ -15,6 +15,9 @@
 .right {
   display: flex;
   align-items: center;
+  /* Reserve the height of a size-md Button so the bar (and the centred logo)
+     stays put on pages whose right-hand side is just a text link. */
+  min-height: 2.75rem;
   gap: var(--space-8);
   font-size: 0.875rem;
   color: var(--muted);

@@ -1,0 +1,183 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-8);
+  max-width: 32rem;
+  margin: 0 auto;
+  padding: var(--space-11) var(--space-6) var(--space-10);
+}
+
+.live {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  text-align: center;
+}
+
+/* Signature indicator: a live reference distribution. The bars form a bell
+   curve (echoing the report's histograms) and a highlight sweeps across them
+   left-to-right, like a measurement scanning the reference data. */
+.curve {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 2.5rem;
+  padding-bottom: 1px;
+  border-bottom: 1px solid var(--border-strong);
+}
+
+.bar {
+  width: 5px;
+  min-height: 4px;
+  border-radius: 2px 2px 0 0;
+  background: var(--brand);
+  opacity: 0.24;
+  transform-origin: bottom;
+  animation: sweep 1.7s ease-in-out infinite;
+}
+
+@keyframes sweep {
+  0%,
+  100% {
+    opacity: 0.22;
+    transform: scaleY(0.92);
+  }
+  40% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.headline {
+  font-family: var(--font-display), serif;
+  font-size: 1.1875rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--ink-strong);
+}
+
+.detail {
+  max-width: 24rem;
+  font-size: 0.875rem;
+  color: var(--muted-2);
+  line-height: 1.45;
+}
+
+/* The live queue: dots for everyone ahead of you, you highlighted at the end. */
+.queue {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 0.75rem;
+}
+
+.dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: var(--radius-pill);
+  background: var(--border-strong);
+  flex: none;
+}
+
+/* The person currently being served (front of the line) gently pulses. */
+.serving {
+  background: var(--muted-2);
+  animation: pulse 1.1s ease-in-out infinite;
+}
+
+/* You. */
+.you {
+  width: 0.625rem;
+  height: 0.625rem;
+  background: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-shadow);
+  animation: none;
+}
+
+.more {
+  color: var(--faint);
+  font-size: 0.875rem;
+  line-height: 1;
+  margin-right: var(--space-1);
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* A geometry fact, set like an editorial aside: serif reading type marked with
+   the wordmark's diamond, quietly bordered to match the report's cards. */
+.fact {
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-start;
+  width: 100%;
+  margin: 0;
+  padding: var(--space-6) var(--space-7);
+  text-align: left;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+}
+
+.factMark {
+  flex: none;
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-top: 0.5rem;
+  border-radius: 1.5px;
+  background: var(--brand);
+  transform: rotate(45deg);
+}
+
+.factBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  /* Reserve roughly three lines so a shorter fact doesn't jump the layout as
+     facts rotate. */
+  min-height: 4.5rem;
+}
+
+.factLabel {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.factText {
+  margin: 0;
+  font-family: var(--font-display), serif;
+  font-size: 1.0625rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bar {
+    animation: none;
+    opacity: 0.55;
+  }
+  .serving {
+    animation: none;
+  }
+}

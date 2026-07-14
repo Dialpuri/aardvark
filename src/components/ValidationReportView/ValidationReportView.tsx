@@ -2,8 +2,11 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useQuery } from '@tanstack/react-query'
 import { ValidationReport } from '@/components/ValidationReport'
+import { JobStatus } from '@/components/JobStatus'
+import { JobError } from '@/components/JobError'
 import { floatIn } from '@/lib/motion'
 import {
+  JobFailedError,
   runAardvark,
   type AnalyseRequest,
   type JobProgress,
@@ -23,20 +26,13 @@ async function runAnalysis(
 ): Promise<AnalyseResponse> {
   try {
     return await runAardvark(input, onProgress)
-  } catch {
-    console.log('Aardvark job could not be run, falling back to sample.')
+  } catch (err) {
+    // A job that ran and reported Failed is a real result — surface it. Only
+    // fall back to the sample when the server couldn't be reached at all.
+    if (err instanceof JobFailedError) throw err
+    console.log('Aardvark server unreachable, falling back to sample.')
     return loadSample()
   }
-}
-
-/** Turn the latest job progress report into a line to show the user. */
-function progressLabel(progress: JobProgress | null): string {
-  if (progress?.status === 'Queued') {
-    const position = progress.queue_position
-    if (position === null) return 'Queued…'
-    return `Queued — ${position === 0 ? 'next in line' : `#${position + 1} in line`}…`
-  }
-  return 'Running Aardvark…'
 }
 
 interface ValidationReportViewProps {
@@ -64,19 +60,20 @@ export function ValidationReportView(props: ValidationReportViewProps) {
       initial="hidden"
       animate="visible"
     >
-      <h1 className={styles.reportTitle}>Geometry report</h1>
-      <p className={styles.note}>
-        Every bond and angle is scored against the COD reference distribution
-        for that given chemical environment.
-      </p>
-
-      {report.isPending && (
-        <p className={styles.status}>{progressLabel(progress)}</p>
+      {report.isPending ? (
+        <JobStatus progress={progress} />
+      ) : report.isError ? (
+        <JobError error={report.error} onRetry={() => report.refetch()} />
+      ) : (
+        <>
+          <h1 className={styles.reportTitle}>Geometry report</h1>
+          <p className={styles.note}>
+            Every bond and angle is scored against the COD reference
+            distribution for that given chemical environment.
+          </p>
+          <ValidationReport report={report.data} />
+        </>
       )}
-      {report.isError && (
-        <p className={styles.status}>Couldn’t analyse that structure.</p>
-      )}
-      {report.data && <ValidationReport report={report.data} />}
     </motion.div>
   )
 }

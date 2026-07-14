@@ -53,7 +53,7 @@ export default function LandingPage() {
           initial="hidden"
           animate="visible"
         >
-          <Badge dot="#1f8f5f">Free · No login · Locally installable </Badge>
+          <Badge dot="#1f8f5f">Free | Open Source · Easy to use </Badge>
           <h1 className={styles.title}>
             Is your ligand dictionary
             <br />
