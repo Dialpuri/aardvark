@@ -16,9 +16,11 @@ import {
 } from '@/lib/cod'
 import type { AngleRecord, AnalyseResponse, BondRecord } from '@/types/cod'
 import { LigandViewer } from '@/components/LigandViewer'
+import { RemediationPanel } from '@/components/RemediationPanel'
 import { KINDS, type Kind } from './kinds'
 import { GeometryRow } from './GeometryRow'
 import { ElementFilter } from './ElementFilter'
+import { useRemediation } from './RemediationContext'
 import styles from './ValidationReport.module.css'
 
 interface ValidationReportProps {
@@ -40,6 +42,7 @@ const SORTS: Record<
 type ViewMode = 'list' | 'rung'
 
 export function ValidationReport(props: ValidationReportProps) {
+  const remediation = useRemediation()
   const [kind, setKind] = useState<Kind>('bonds')
   const [sortKey, setSortKey] = useState<SortKey>('deviation')
   const [viewMode, setViewMode] = useState<ViewMode>('list')
@@ -103,6 +106,8 @@ export function ValidationReport(props: ValidationReportProps) {
           </span>
         </div>
       </div>
+
+      {remediation.editMode && <RemediationPanel report={props.report} />}
 
       <div className={styles.tabs} role="tablist">
         {(Object.keys(KINDS) as Kind[]).map((k) => (

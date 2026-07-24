@@ -40,6 +40,54 @@
   gap: var(--space-2);
 }
 
+/* View ⇄ Edit restraints segmented control — mirrors the List / By rung toggle. */
+.modeToggle {
+  display: inline-flex;
+  padding: 2px;
+  gap: 2px;
+  background: var(--subtle);
+  border-radius: var(--radius-sm);
+}
+
+.modeOption {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border: none;
+  border-radius: var(--radius-xs);
+  background: transparent;
+  font-size: 0.75rem;
+  color: var(--muted);
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.modeOptionActive {
+  background: var(--card);
+  color: var(--ink);
+  font-weight: 500;
+  box-shadow: 0 1px 2px rgba(16, 32, 48, 0.08);
+}
+
+/* Count of saved edits, carried on the Edit tab. */
+.modeBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.05rem;
+  height: 1.05rem;
+  padding: 0 4px;
+  border-radius: var(--radius-pill);
+  background: var(--tint);
+  color: var(--brand);
+  font-family: var(--font-mono), serif;
+  font-size: 0.625rem;
+  font-weight: 600;
+}
+
 .tally {
   font-size: 0.75rem;
   font-weight: 500;
@@ -361,6 +409,19 @@
   border-left: 1px solid currentColor;
 }
 
+/* "edited" flag in the row head when a row carries a pending remediation. */
+.editedBadge {
+  font-family: var(--font-sans), serif;
+  font-size: 0.5625rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-pill);
+  color: var(--brand);
+  background: var(--tint);
+}
+
 .chevron {
   font-size: 1.125rem;
   line-height: 1;
@@ -542,6 +603,16 @@
 /* Reuse .chevron sizing but tuck it inline next to the label. */
 .obsToggle .chevron {
   font-size: 0.875rem;
+}
+
+/* Full-width remediation editor block, below the observations. */
+.remSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border);
 }
 
 .obsPanel {

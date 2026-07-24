@@ -13,8 +13,11 @@ import {
   statusLabel,
 } from '@/lib/cod'
 import type { AngleRecord, BondRecord } from '@/types/cod'
+import { RemediationEditor } from '@/components/RemediationEditor'
+import { recordKey } from '@/lib/remediation'
 import { KINDS, type Kind } from './kinds'
 import { ObservationList } from './ObservationList'
+import { useRemediation } from './RemediationContext'
 import styles from './ValidationReport.module.css'
 
 interface GeometryRowProps {
@@ -26,14 +29,18 @@ interface GeometryRowProps {
 /** One bond/angle: a summary head that expands to depiction, distribution and
  * the underlying COD observations. */
 export function GeometryRow(props: GeometryRowProps) {
+  const remediation = useRemediation()
   const [open, setOpen] = useState(props.defaultOpen)
   const [obsOpen, setObsOpen] = useState(false)
+  const [remOpen, setRemOpen] = useState(true)
   const [meanHover, setMeanHover] = useState(false)
   const record = props.record
   const cfg = KINDS[props.kind]
   const status = outlierStatus(record)
   const reference = hasReference(record)
   const obs = record.obs ?? []
+  const edited =
+    remediation.getEdit(recordKey(props.kind, record)) !== undefined
 
   return (
     <motion.li className={styles.row} variants={floatIn}>
@@ -65,6 +72,7 @@ export function GeometryRow(props: GeometryRowProps) {
             </span>
           )}
         </span>
+        {edited && <span className={styles.editedBadge}>edited</span>}
         <span className={`${styles.chevron} ${open ? styles.chevronOpen : ''}`}>
           ›
         </span>
@@ -175,6 +183,29 @@ export function GeometryRow(props: GeometryRowProps) {
                 </span>
               </div>
             ))}
+
+          {remediation.editMode && (
+            <div className={styles.remSection}>
+              <button
+                type="button"
+                className={styles.obsToggle}
+                aria-expanded={remOpen}
+                onClick={() => setRemOpen((o) => !o)}
+              >
+                Remediate restraint
+                <span
+                  className={`${styles.chevron} ${
+                    remOpen ? styles.chevronOpen : ''
+                  }`}
+                >
+                  ›
+                </span>
+              </button>
+              {remOpen && (
+                <RemediationEditor record={record} kind={props.kind} />
+              )}
+            </div>
+          )}
         </div>
       )}
     </motion.li>

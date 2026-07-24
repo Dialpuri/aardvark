@@ -1,0 +1,205 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--subtle);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.heading {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-sans), serif;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+}
+
+.count {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.download,
+.resetAll {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-sans), serif;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.download {
+  border: 1px solid var(--brand);
+  background: var(--brand);
+  color: #fff;
+}
+
+.download:hover:not(:disabled) {
+  background: var(--brand-hover);
+  border-color: var(--brand-hover);
+}
+
+.resetAll {
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--muted);
+}
+
+.resetAll:hover:not(:disabled) {
+  border-color: var(--border-strong);
+  color: var(--ink);
+}
+
+.download:disabled,
+.resetAll:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.empty {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--muted-2);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--card);
+}
+
+.atoms {
+  width: 7rem;
+  flex-shrink: 0;
+  font-family: var(--font-mono), serif;
+  font-size: 0.8125rem;
+  color: var(--ink);
+}
+
+/* value line, plus an optional esd line stacked beneath it. */
+.change {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.changeLine {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  font-family: var(--font-mono), serif;
+  font-size: 0.8125rem;
+}
+
+.esdLine {
+  font-size: 0.75rem;
+}
+
+/* "value" / "esd" row key, so the two lines line up and read clearly. */
+.field {
+  width: 2.5rem;
+  flex-shrink: 0;
+  font-family: var(--font-sans), serif;
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--faint);
+}
+
+.from {
+  color: var(--muted-2);
+  text-decoration: line-through;
+}
+
+.arrow {
+  color: var(--faint);
+}
+
+.to {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.delta {
+  font-size: 0.6875rem;
+}
+
+.up {
+  color: var(--bad);
+}
+
+.down {
+  color: var(--ok);
+}
+
+.source {
+  flex-shrink: 0;
+  font-family: var(--font-sans), serif;
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--subtle);
+}
+
+.revert {
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-family: var(--font-sans), serif;
+  font-size: 0.75rem;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.revert:hover {
+  color: var(--ink);
+  text-decoration: underline;
+}

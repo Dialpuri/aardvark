@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useQuery } from '@tanstack/react-query'
 import { ValidationReport } from '@/components/ValidationReport'
+import { ReportModeToggle } from '@/components/ValidationReport/ReportModeToggle'
+import { RemediationProvider } from '@/components/ValidationReport/RemediationProvider'
 import { JobStatus } from '@/components/JobStatus'
 import { JobError } from '@/components/JobError'
 import { floatIn } from '@/lib/motion'
@@ -11,13 +13,14 @@ import {
   type AnalyseRequest,
   type JobProgress,
 } from '@/lib/analyse'
+import { withMockDictionary } from '@/lib/mockDictionary'
 import type { AnalyseResponse } from '@/types/cod'
 import styles from './ValidationReportView.module.css'
 
 async function loadSample(): Promise<AnalyseResponse> {
   const res = await fetch(`${import.meta.env.BASE_URL}sample/A1C3B.json`)
   if (!res.ok) throw new Error(`Failed to load sample report (${res.status})`)
-  return res.json()
+  return withMockDictionary(await res.json())
 }
 
 async function runAnalysis(
@@ -25,7 +28,7 @@ async function runAnalysis(
   onProgress: (progress: JobProgress) => void,
 ): Promise<AnalyseResponse> {
   try {
-    return await runAardvark(input, onProgress)
+    return withMockDictionary(await runAardvark(input, onProgress))
   } catch (err) {
     // A job that ran and reported Failed is a real result — surface it. Only
     // fall back to the sample when the server couldn't be reached at all.
@@ -61,15 +64,18 @@ export function ValidationReportView(props: ValidationReportViewProps) {
       animate="visible"
     >
       {report.isSuccess ? (
-        <>
-          <h1 className={styles.reportTitle}>Geometry report</h1>
+        <RemediationProvider>
+          <div className={styles.reportHeader}>
+            <h1 className={styles.reportTitle}>Geometry report</h1>
+            <ReportModeToggle />
+          </div>
           <p className={styles.note}>
             {props.request?.mode === 'model'
               ? 'Every observed bond and angle is scored against the COD reference distribution for that given chemical environment.'
               : 'Every idealised bond and angle is scored against the COD reference distribution for that given chemical environment.'}
           </p>
           <ValidationReport report={report.data} />
-        </>
+        </RemediationProvider>
       ) : report.isError && !report.isFetching ? (
         <JobError error={report.error} onRetry={() => report.refetch()} />
       ) : (

@@ -9,6 +9,8 @@ export const KINDS: Record<
     unit: string
     axisLabel: string
     format: (n: number) => string
+    /** Increment for the numeric restraint inputs in the remediation editor. */
+    step: number
   }
 > = {
   bonds: {
@@ -16,11 +18,13 @@ export const KINDS: Record<
     unit: ' Å',
     axisLabel: 'Bond length (Å)',
     format: (n) => n.toFixed(3),
+    step: 0.001,
   },
   angles: {
     label: 'Angles',
     unit: '°',
     axisLabel: 'Bond angle (°)',
     format: (n) => n.toFixed(1),
+    step: 0.01,
   },
 }

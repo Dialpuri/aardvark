@@ -68,6 +68,19 @@ export interface Observation {
   centre?: string
 }
 
+/**
+ * The current restraint for a bond/angle as it stands in the source restraints
+ * dictionary — the idealised target refinement pulls towards. Introduced in
+ * format v6 (mocked from the idealised `value`/`sd` until the server emits it;
+ * see `@/lib/mockDictionary`). This is what the remediation editor overrides.
+ */
+export interface DictionaryRestraint {
+  /** Target geometry: `value_dist` (Å) for bonds, `value_angle` (°) for angles. */
+  value: number
+  /** Restraint sigma: `value_dist_esd` / `value_angle_esd`. */
+  esd: number
+}
+
 /** Adaptive-bin histogram of the reference population. */
 export interface CodHistogram {
   /** `counts[i]` spans `edges[i]` → `edges[i + 1]`. Length = nbins (20–80). */
@@ -99,6 +112,12 @@ interface GeometryRecord {
    */
   n_sigma: number | null
   histogram: CodHistogram
+  /**
+   * The restraint this geometry currently carries in the source dictionary, the
+   * target the remediation editor overrides. Optional: absent on legacy reports
+   * and on records with no restraint to remediate. See {@link DictionaryRestraint}.
+   */
+  dict?: DictionaryRestraint
   /** Self-contained depiction with these atoms highlighted; `null` if none. */
   svg: string | null
   /**

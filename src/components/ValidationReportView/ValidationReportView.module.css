@@ -4,11 +4,21 @@
   padding: var(--space-8) var(--space-8) var(--space-11);
 }
 
+/* Title on the left, the View ⇄ Edit toggle pinned to the right. */
+.reportHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-2);
+}
+
 .reportTitle {
   font-size: 1.75rem;
   font-weight: 500;
   letter-spacing: -0.02em;
-  margin: 0 0 var(--space-2);
+  margin: 0;
 }
 
 .note {

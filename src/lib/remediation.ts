@@ -1,0 +1,164 @@
+import type {
+  AnalyseResponse,
+  AngleRecord,
+  BondRecord,
+  DictionaryRestraint,
+} from '@/types/cod'
+import type { Kind } from '@/components/ValidationReport/kinds'
+import { geometryLabel, reportCompId } from '@/lib/cod'
+
+/** Where a remediated target came from — drives the source tag on each diff. */
+export type RemediationSource = 'cod-mean' | 'custom'
+
+/**
+ * One pending restraint override. Carries everything the diff tracker and CIF
+ * export need without reaching back into the report, so the panel stays
+ * decoupled from the record list.
+ */
+export interface RemediationEdit {
+  /** Stable identity, from {@link recordKey}. */
+  key: string
+  kind: Kind
+  /** Atom names, in order: `[atom_1, atom_2]` or `[atom_1, atom_2, atom_3]`. */
+  atoms: string[]
+  /** Display label, e.g. `"C13–O3"` — matches the row head. */
+  label: string
+  /** The dictionary restraint before remediation, for the diff and revert. */
+  original: DictionaryRestraint
+  /** The remediated target value. */
+  value: number
+  /** The remediated restraint esd. */
+  esd: number
+  source: RemediationSource
+}
+
+/** Stable per-record key, unique within a report (atom names don't repeat). */
+export function recordKey(
+  kind: Kind,
+  record: BondRecord | AngleRecord,
+): string {
+  return `${kind}:${geometryLabel(record)}`
+}
+
+/** Singular noun for a kind, e.g. for inline prose. */
+export function geometryEditLabel(kind: Kind): string {
+  return kind === 'bonds' ? 'bond' : 'angle'
+}
+
+/** Build a {@link RemediationEdit} for a record from a chosen target/esd. */
+export function makeEditFor(
+  kind: Kind,
+  record: BondRecord | AngleRecord,
+  original: DictionaryRestraint,
+  value: number,
+  esd: number,
+  source: RemediationSource,
+): RemediationEdit {
+  return {
+    key: recordKey(kind, record),
+    kind,
+    atoms: recordAtoms(record),
+    label: geometryLabel(record),
+    original,
+    value,
+    esd,
+    source,
+  }
+}
+
+/** Ordered atom names for a record — two for a bond, three for an angle. */
+export function recordAtoms(record: BondRecord | AngleRecord): string[] {
+  return 'atom_3' in record
+    ? [record.atom_1, record.atom_2, record.atom_3]
+    : [record.atom_1, record.atom_2]
+}
+
+/**
+ * The restraint in force for a record: the pending edit if one exists, else the
+ * dictionary value. `null` when the record carries no dictionary restraint.
+ */
+export function effectiveRestraint(
+  record: BondRecord | AngleRecord,
+  edit: RemediationEdit | undefined,
+): DictionaryRestraint | null {
+  if (edit) return { value: edit.value, esd: edit.esd }
+  return record.dict ?? null
+}
+
+/** Signed change in target value (new − original); `0` when unchanged. */
+export function targetDelta(edit: RemediationEdit): number {
+  return edit.value - edit.original.value
+}
+
+/** How many CIF decimal places a kind's values are quoted at. */
+const KIND_DP: Record<Kind, number> = { bonds: 3, angles: 2 }
+
+/** Format a value at its kind's CIF precision, e.g. `1.238`, `+0.005`. */
+export function formatAt(kind: Kind, value: number, signed = false): string {
+  const text = value.toFixed(KIND_DP[kind])
+  return signed && value > 0 ? `+${text}` : text
+}
+
+/** CIF category and columns each kind's restraints are written under. */
+const CIF_LOOP: Record<
+  Kind,
+  { category: string; valueCol: string; esdCol: string; atomCols: string[] }
+> = {
+  bonds: {
+    category: '_chem_comp_bond',
+    valueCol: 'value_dist',
+    esdCol: 'value_dist_esd',
+    atomCols: ['atom_id_1', 'atom_id_2'],
+  },
+  angles: {
+    category: '_chem_comp_angle',
+    valueCol: 'value_angle',
+    esdCol: 'value_angle_esd',
+    atomCols: ['atom_id_1', 'atom_id_2', 'atom_id_3'],
+  },
+}
+
+function cifLoop(compId: string, kind: Kind, edits: RemediationEdit[]): string {
+  const loop = CIF_LOOP[kind]
+  const header = [
+    'loop_',
+    `${loop.category}.comp_id`,
+    ...loop.atomCols.map((c) => `${loop.category}.${c}`),
+    `${loop.category}.${loop.valueCol}`,
+    `${loop.category}.${loop.esdCol}`,
+  ]
+  const rows = edits.map((e) =>
+    [compId, ...e.atoms, formatAt(kind, e.value), formatAt(kind, e.esd)].join(
+      ' ',
+    ),
+  )
+  return [...header, ...rows].join('\n')
+}
+
+/**
+ * A minimal restraints-CIF fragment holding only the remediated bonds and
+ * angles — enough to patch a dictionary or diff against the original. Returns
+ * `null` when there are no edits.
+ */
+export function buildCifPatch(
+  report: Pick<AnalyseResponse, 'comp_id' | 'metadata'>,
+  edits: RemediationEdit[],
+): string | null {
+  if (edits.length === 0) return null
+  const compId = reportCompId(report) ?? 'LIG'
+  const byKind = (kind: Kind) =>
+    edits
+      .filter((e) => e.kind === kind)
+      .sort((a, b) => a.label.localeCompare(b.label))
+
+  const blocks: string[] = [
+    `# Remediated restraints for ${compId}`,
+    `# ${edits.length} change${edits.length === 1 ? '' : 's'} — generated by Aardvark`,
+    `data_comp_${compId}`,
+  ]
+  for (const kind of ['bonds', 'angles'] as Kind[]) {
+    const kindEdits = byKind(kind)
+    if (kindEdits.length > 0) blocks.push(cifLoop(compId, kind, kindEdits))
+  }
+  return blocks.join('\n\n') + '\n'
+}
