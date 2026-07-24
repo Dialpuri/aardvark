@@ -1,5 +1,12 @@
 import type { HistogramBin, HistogramStatus } from '@/components/Histogram'
-import type { AngleRecord, BondRecord, CodHistogram, Rung } from '@/types/cod'
+import type {
+  AnalyseResponse,
+  AngleRecord,
+  BondRecord,
+  CodHistogram,
+  Rung,
+  RungToken,
+} from '@/types/cod'
 
 /**
  * Outlier status for a geometry record, driven by `n_sigma` (how many SDs the
@@ -46,22 +53,97 @@ export const statusLabel: Record<GeometryStatus, string> = {
   none: 'no reference',
 }
 
-/** Human-readable name for each fallback rung, best → worst. */
-export const rungLabel: Record<Rung, string> = {
+/** Match specificity of each known rung token, best (0) → worst. */
+const RUNG_TOKEN_RANK: Record<RungToken, number> = {
+  full: 0,
+  main: 1,
+  main_type: 1,
+  nb1nb2: 2,
+  nb2: 3,
+  inring: 4,
+  hybrid: 5,
+  element: 6,
+}
+
+/** Human-readable name for each known rung token. */
+const RUNG_TOKEN_LABEL: Record<RungToken, string> = {
   full: 'exact match',
-  main: 'main-chain match',
+  main: 'main-type match',
+  main_type: 'main-type match',
   nb1nb2: 'neighbour match',
+  nb2: 'second-neighbour match',
+  inring: 'ring match',
   hybrid: 'hybrid match',
   element: 'element only',
 }
 
-/** Longer explanation of how specific a rung's reference match was. */
-export const rungDescription: Record<Rung, string> = {
+/** Longer explanation of how specific each known rung token's match was. */
+const RUNG_TOKEN_DESCRIPTION: Record<RungToken, string> = {
   full: 'Reference drawn from atoms with identical acedrg types.',
   main: 'Reference drawn from atoms matching on their main type.',
+  main_type: 'Reference drawn from atoms matching on their main type.',
   nb1nb2: 'Reference matched on first- and second-neighbour environment.',
+  nb2: 'Reference matched on second-neighbour environment.',
+  inring: 'Reference matched on ring membership.',
   hybrid: 'Reference matched on a hybrid of type and neighbours.',
   element: 'No specific type match — reference is by element only.',
+}
+
+/** Split a (possibly compound) rung into trimmed tokens, e.g. `'main / nb1nb2'`. */
+function rungTokens(rung: Rung): string[] {
+  return rung
+    .split('/')
+    .map((t) => t.trim())
+    .filter(Boolean)
+}
+
+/** Readable form of an unrecognised token, e.g. `'main_type'` → `'main type'`. */
+function humaniseToken(token: string): string {
+  return token.replace(/_/g, ' ')
+}
+
+/**
+ * Human-readable name for a rung. Handles v5 per-atom compounds (`'main /
+ * nb1nb2'`) by labelling each token, and shows unknown tokens verbatim
+ * (humanised) rather than dropping them — so the "Match" field is never blank.
+ */
+export function rungLabel(rung: Rung): string {
+  const tokens = rungTokens(rung)
+  if (tokens.length === 0) return humaniseToken(rung) || 'unknown'
+  return tokens
+    .map((t) => RUNG_TOKEN_LABEL[t as RungToken] ?? humaniseToken(t))
+    .join(' / ')
+}
+
+/** Tooltip explanation for how specific a rung's reference match was. */
+export function rungDescription(rung: Rung): string {
+  const tokens = rungTokens(rung)
+  if (tokens.length === 1) {
+    const desc = RUNG_TOKEN_DESCRIPTION[tokens[0] as RungToken]
+    if (desc) return desc
+  }
+  return `Reference matched per atom: ${rungLabel(rung)}.`
+}
+
+/**
+ * Specificity rank for a (possibly compound) rung — smaller is a better match.
+ * A record is only as good as its weakest-matched atom, so a compound ranks by
+ * its least-specific token; unknown tokens sort last.
+ */
+export function rungRank(rung: Rung): number {
+  const tokens = rungTokens(rung)
+  if (tokens.length === 0) return Number.MAX_SAFE_INTEGER
+  return Math.max(
+    ...tokens.map(
+      (t) => RUNG_TOKEN_RANK[t as RungToken] ?? Number.MAX_SAFE_INTEGER,
+    ),
+  )
+}
+
+/** Distinct rungs present in the records, ordered best → worst for grouping. */
+export function orderedRungs(records: { rung: Rung }[]): Rung[] {
+  const seen = Array.from(new Set(records.map((r) => r.rung)))
+  return seen.sort((a, b) => rungRank(a) - rungRank(b) || a.localeCompare(b))
 }
 
 /**
@@ -78,11 +160,30 @@ export function cleanDepictionSvg(svg: string): string {
     .replace(/(<svg\b[^>]*?)\swidth='[^']*'\sheight='[^']*'/, '$1')
 }
 
-/** First available depiction in the report — the same molecule for every row. */
-export function reportDepiction(report: {
-  bonds: BondRecord[]
-  angles: AngleRecord[]
-}): string | null {
+/**
+ * The ligand code for a report, regardless of format version: v5 keeps it in
+ * `metadata.comp_id`, v1 in the top-level `comp_id`. Returns `undefined` when
+ * neither is present (callers typically fall back to `'ligand'`).
+ */
+export function reportCompId(
+  report: Pick<AnalyseResponse, 'comp_id' | 'metadata'>,
+): string | undefined {
+  return report.metadata?.comp_id ?? report.comp_id
+}
+
+/**
+ * The molecule depiction for a report — the same molecule for every row.
+ * Prefers the v5 `metadata.original_svg` (a clean, unhighlighted full-molecule
+ * drawing); falls back to the first per-record `svg` (highlighted) for v1
+ * reports that carry no metadata.
+ */
+export function reportDepiction(
+  report: Pick<AnalyseResponse, 'metadata'> & {
+    bonds: BondRecord[]
+    angles: AngleRecord[]
+  },
+): string | null {
+  if (report.metadata?.original_svg) return report.metadata.original_svg
   const record = [...report.bonds, ...report.angles].find((r) => r.svg)
   return record?.svg ?? null
 }
@@ -168,12 +269,3 @@ export function byAbsoluteDeviation(
   const bv = b.delta === null ? -Infinity : Math.abs(b.delta)
   return bv - av
 }
-
-/** Rungs best (most specific) → worst; drives the "by rung" grouped view. */
-export const RUNG_ORDER: Rung[] = [
-  'full',
-  'main',
-  'nb1nb2',
-  'hybrid',
-  'element',
-]

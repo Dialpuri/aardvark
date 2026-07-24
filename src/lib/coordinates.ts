@@ -1,3 +1,4 @@
+import { reportCompId } from '@/lib/cod'
 import type { AnalyseResponse } from '@/types/cod'
 
 /** Bundled stand-in coordinates, used until the server returns real ones. */
@@ -21,7 +22,7 @@ export async function loadReportCoordinates(
   if (report.coordinates) {
     return {
       text: report.coordinates,
-      name: `${report.comp_id ?? 'ligand'}.cif`,
+      name: `${reportCompId(report) ?? 'ligand'}.cif`,
     }
   }
   const res = await fetch(MOCK_COORDINATES_URL)

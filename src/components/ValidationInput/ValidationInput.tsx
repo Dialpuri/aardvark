@@ -94,6 +94,15 @@ const FILE_TABS: Record<AnalyseMode, FileTabConfig> = {
       </>
     ),
   },
+  chemistry: {
+    tabLabel: 'Chemistry file',
+    accept: '.mol,.sdf,.mol2,.smi,.inchi',
+    hint: (
+      <>
+        Drop a <code>.mol</code> / <code>.sdf</code> chemistry file
+      </>
+    ),
+  },
 }
 
 /**
@@ -125,12 +134,13 @@ interface ValidationInputProps {
 }
 
 export function ValidationInput(props: ValidationInputProps) {
-  // Dictionary path offers typed SMILES/InChI as well as a file; the model path
-  // is file-only (plus a ligand code), so it opens straight on the dropzone.
-  const textTabs = props.mode === 'dictionary' ? TEXT_TABS : []
+  // The dictionary and chemistry paths take a chemical description, so they
+  // offer typed SMILES/InChI as well as a file; the model path is file-only
+  // (plus a ligand code), so it opens straight on the dropzone.
+  const textTabs = props.mode === 'model' ? [] : TEXT_TABS
   const fileTab = FILE_TABS[props.mode]
   const [tab, setTab] = useState<Tab>(
-    props.mode === 'dictionary' ? 'smiles' : 'file',
+    props.mode === 'model' ? 'file' : 'smiles',
   )
   const [text, setText] = useState<Record<TextFormat, string>>({
     smiles: TEXT_TABS[0].initial,

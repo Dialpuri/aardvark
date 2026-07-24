@@ -10,11 +10,16 @@ export default defineConfig(({ mode }) => {
   // (e.g. in `.env.local`, `VITE_AARDVARK_PROXY=http://localhost:8080`). When
   // set, the dev server proxies `/api/*` — HTTP and websocket — to it and the
   // mock is switched off; when unset, requests are answered by the mock.
-  const backend = loadEnv(mode, process.cwd(), '').VITE_AARDVARK_PROXY
+  const env = loadEnv(mode, process.cwd(), '')
+  const backend = env.VITE_AARDVARK_PROXY
+  const mockResultJson = env.MOCK_AARDVARK_RESULT_JSON
 
   return {
     base: '/aardvark/',
-    plugins: [react(), ...(backend ? [] : [mockAardvark()])],
+    plugins: [
+      react(),
+      ...(backend ? [] : [mockAardvark(mockResultJson || undefined)]),
+    ],
     server: backend
       ? {
           proxy: {

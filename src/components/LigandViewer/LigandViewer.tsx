@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useQuery } from '@tanstack/react-query'
-import { cleanDepictionSvg } from '@/lib/cod'
+import { cleanDepictionSvg, reportCompId } from '@/lib/cod'
 import { loadReportCoordinates } from '@/lib/coordinates'
 import { MoleculeViewer } from '@/components/MoleculeViewer'
 import type { AnalyseResponse } from '@/types/cod'
@@ -16,11 +16,12 @@ interface LigandViewerProps {
 
 /**
  * The ligand thumbnail in the report summary. Shows the 2D depiction and, on
- * click, expands into an interactive gemmimol 3D viewer in a modal.
+ * click, opens a modal with 2D (the depiction SVG) and 3D (an interactive
+ * gemmimol viewer) tabs.
  */
 export function LigandViewer(props: LigandViewerProps) {
   const [open, setOpen] = useState(false)
-  const label = props.report.comp_id ?? 'ligand'
+  const label = reportCompId(props.report) ?? 'ligand'
 
   return (
     <>
@@ -28,7 +29,7 @@ export function LigandViewer(props: LigandViewerProps) {
         type="button"
         className={styles.thumb}
         onClick={() => setOpen(true)}
-        aria-label={`Show ${label} in 3D`}
+        aria-label={`Show ${label}`}
       >
         {props.depiction ? (
           <span
@@ -52,25 +53,36 @@ export function LigandViewer(props: LigandViewerProps) {
         open={open}
         label={label}
         report={props.report}
+        depiction={props.depiction}
         onClose={() => setOpen(false)}
       />
     </>
   )
 }
 
+/** Which view of the ligand the modal is showing. */
+type ViewTab = '2d' | '3d'
+
 interface LigandModalProps {
   open: boolean
   label: string
   report: AnalyseResponse
+  /** 2D depiction SVG; when absent the modal shows only the 3D view. */
+  depiction: string | null
   onClose: () => void
 }
 
 function LigandModal(props: LigandModalProps) {
-  // Only load coordinates once the modal has actually been opened.
+  // Open on the 2D depiction (what the user clicked) when there is one; fall
+  // back to 3D otherwise. The 3D view is always available via the mock/server.
+  const [tab, setTab] = useState<ViewTab>(props.depiction ? '2d' : '3d')
+
+  // Load coordinates only once the modal is open *and* the 3D tab is in view —
+  // viewing only the 2D depiction needs no coordinate fetch.
   const coords = useQuery({
     queryKey: ['coordinates', props.report],
     queryFn: () => loadReportCoordinates(props.report),
-    enabled: props.open,
+    enabled: props.open && tab === '3d',
   })
 
   // Close on Escape while open.
@@ -100,7 +112,7 @@ function LigandModal(props: LigandModalProps) {
             className={styles.dialog}
             role="dialog"
             aria-modal="true"
-            aria-label={`${props.label} in 3D`}
+            aria-label={`${props.label} viewer`}
             initial={{ opacity: 0, scale: 0.96, y: 8 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 8 }}
@@ -109,18 +121,42 @@ function LigandModal(props: LigandModalProps) {
           >
             <header className={styles.head}>
               <span className={styles.title}>{props.label}</span>
+              {props.depiction && (
+                <div className={styles.tabs} role="tablist">
+                  {(['2d', '3d'] as ViewTab[]).map((t) => (
+                    <button
+                      key={t}
+                      type="button"
+                      role="tab"
+                      aria-selected={tab === t}
+                      className={`${styles.tab} ${tab === t ? styles.tabActive : ''}`}
+                      onClick={() => setTab(t)}
+                    >
+                      {t.toUpperCase()}
+                    </button>
+                  ))}
+                </div>
+              )}
               <button
                 type="button"
                 className={styles.close}
                 onClick={props.onClose}
-                aria-label="Close 3D view"
+                aria-label="Close viewer"
               >
                 ✕
               </button>
             </header>
 
             <div className={styles.body}>
-              {coords.isSuccess ? (
+              {tab === '2d' && props.depiction ? (
+                <span
+                  className={styles.depiction}
+                  aria-label={`${props.label} 2D depiction`}
+                  dangerouslySetInnerHTML={{
+                    __html: cleanDepictionSvg(props.depiction),
+                  }}
+                />
+              ) : coords.isSuccess ? (
                 <MoleculeViewer
                   text={coords.data.text}
                   name={coords.data.name}
@@ -134,7 +170,9 @@ function LigandModal(props: LigandModalProps) {
               )}
             </div>
 
-            <p className={styles.hint}>Drag to rotate · scroll to zoom</p>
+            {tab === '3d' && (
+              <p className={styles.hint}>Drag to rotate · scroll to zoom</p>
+            )}
           </motion.div>
         </motion.div>
       )}

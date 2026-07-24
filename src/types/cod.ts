@@ -6,18 +6,50 @@
  */
 
 /**
- * Which fallback rung the reference stats were drawn from, best → worst.
- * A coarse rung (e.g. `element`) means few exact-type matches existed, so the
- * reference distribution is broader — worth surfacing to the user.
+ * Known atom-match levels, best (most specific) → worst. Format v5 can report a
+ * different level per atom, so a record's {@link Rung} may be a single token or
+ * a compound like `'main / nb1nb2'` — {@link RungToken} lists the tokens it is
+ * built from.
  */
-export type Rung = 'full' | 'main' | 'nb1nb2' | 'hybrid' | 'element'
+export type RungToken =
+  | 'full'
+  | 'main'
+  | 'main_type'
+  | 'nb1nb2'
+  | 'nb2'
+  | 'inring'
+  | 'hybrid'
+  | 'element'
 
-/** Full acedrg 4-level atom type; handy for tooltips but not required. */
+/**
+ * Which fallback level(s) the reference stats were drawn from. A coarse match
+ * (e.g. `element`) means few exact-type matches existed, so the reference
+ * distribution is broader — worth surfacing to the user. Free-form because v5
+ * reports per-atom compounds (`'nb2 / inring'`); present it with `rungLabel`
+ * and order it with `rungRank` rather than comparing against a fixed set.
+ */
+export type Rung = string
+
+/**
+ * Acedrg atom type for one end of a bond/angle; handy for tooltips but not
+ * required. Format v5 keys these by descriptive name (`full_type` … `element`);
+ * v1 used positional `level-1` … `level-4`. Both are kept optional so a report
+ * of either version type-checks — v5 is the current standard.
+ */
 export interface AtomType {
-  'level-1': string
-  'level-2': string
-  'level-3': string
-  'level-4': string
+  /** v5: fully-qualified type (v1 `level-4`). */
+  full_type?: string
+  /** v5: main type without neighbour braces (v1 `level-3`). */
+  main_type?: string
+  /** v5: first-/second-neighbour signature (v1 `level-2`). */
+  nb1nb2?: string
+  /** v5: bare element symbol (v1 `level-1`). */
+  element?: string
+  /** @deprecated v1 positional types; superseded by the named fields above. */
+  'level-1'?: string
+  'level-2'?: string
+  'level-3'?: string
+  'level-4'?: string
 }
 
 /**
@@ -90,9 +122,56 @@ export interface AngleRecord extends GeometryRecord {
   atom_3: string
 }
 
+/** A tool that contributed to producing the report. */
+export interface SoftwareInfo {
+  name: string
+  version: string | null
+  description?: string
+}
+
+/** Where the analysed ligand sits in its source structure. */
+export interface ReportLocation {
+  model: number
+  chain_id: string
+  seqnum: number
+  ins_code: string
+  resname: string
+}
+
+/**
+ * Provenance and identity for the report, introduced in format v5. Older (v1)
+ * reports carry no `metadata`; the ligand code then lives in the top-level
+ * `comp_id`. Prefer {@link reportCompId} to read the code regardless of version.
+ */
+export interface ReportMetadata {
+  /** Ligand three/five-letter code. */
+  comp_id?: string
+  /** Human-readable chemical name, when known. */
+  name?: string | null
+  /** How the report was produced, e.g. `'coordinates'` or `'dictionary'`. */
+  source?: string
+  /** ISO-8601 timestamp the report was generated. */
+  date?: string
+  acedrg_version?: string | null
+  software?: SoftwareInfo[]
+  coord_file?: string
+  /** Coordinate selection id, e.g. `'//A/303'`. */
+  cid?: string
+  location?: ReportLocation
+  /** `sha256:…` digest of the input. */
+  input_hash?: string
+  /** Clean full-molecule depiction (no per-record highlight); see `reportDepiction`. */
+  original_svg?: string
+}
+
 export interface AnalyseResponse {
   format_version: number
-  /** Ligand three/five-letter code, when the request supplied one. */
+  /** Provenance/identity block (format v5+). Absent on legacy v1 reports. */
+  metadata?: ReportMetadata
+  /**
+   * Ligand three/five-letter code — top-level in v1 only. In v5 it moved into
+   * {@link ReportMetadata.comp_id}; read it via {@link reportCompId}.
+   */
   comp_id?: string
   bonds: BondRecord[]
   angles: AngleRecord[]

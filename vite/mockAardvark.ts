@@ -30,10 +30,13 @@ import type { Plugin } from 'vite'
  * e.g. a SMILES of `queue=5` starts fifth in the queue, `slow=10 CCO` finishes
  * after ten seconds. Anything without a directive gets the happy path.
  */
-export function mockAardvark(): Plugin {
-  const samplePath = fileURLToPath(
-    new URL('../public/sample/A1C3B.json', import.meta.url),
-  )
+export function mockAardvark(resultJsonPath?: string): Plugin {
+  // `GET /api/get_json_result/{id}` serves this file. Defaults to the bundled
+  // sample; override it (e.g. to point at a freshly generated result) by setting
+  // `MOCK_AARDVARK_RESULT_JSON` in `.env.local`.
+  const samplePath =
+    resultJsonPath ??
+    fileURLToPath(new URL('../public/sample/A1C3B.json', import.meta.url))
 
   // Remember each spawned job's scenario so the websocket handler (a separate
   // request) can replay the right sequence of progress reports for it.

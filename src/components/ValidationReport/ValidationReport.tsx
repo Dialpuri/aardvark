@@ -4,11 +4,12 @@ import { staggerContainer } from '@/lib/motion'
 import {
   byAbsoluteDeviation,
   byOutlierSeverity,
-  RUNG_ORDER,
+  orderedRungs,
   geometryLabel,
   hasReference,
   outlierStatus,
   recordElements,
+  reportCompId,
   reportDepiction,
   reportElements,
   rungLabel,
@@ -85,7 +86,7 @@ export function ValidationReport(props: ValidationReportProps) {
           <LigandViewer report={props.report} depiction={depiction} />
           <div>
             <span className={styles.ligand}>
-              {props.report.comp_id ?? 'ligand'}
+              {reportCompId(props.report) ?? 'ligand'}
             </span>
             <span className={styles.summaryMeta}>
               {props.report.bonds.length} bonds · {props.report.angles.length}{' '}
@@ -189,13 +190,13 @@ export function ValidationReport(props: ValidationReportProps) {
         </motion.ul>
       ) : (
         <div className={styles.groups}>
-          {RUNG_ORDER.map((rung) => {
+          {orderedRungs(records).map((rung) => {
             const group = records.filter((r) => r.rung === rung)
             if (group.length === 0) return null
             return (
               <section key={rung} className={styles.group}>
                 <header className={styles.groupHead}>
-                  <span className={styles.groupTitle}>{rungLabel[rung]}</span>
+                  <span className={styles.groupTitle}>{rungLabel(rung)}</span>
                   <span className={styles.groupCount}>{group.length}</span>
                 </header>
                 <motion.ul

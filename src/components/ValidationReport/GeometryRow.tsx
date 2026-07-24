@@ -113,8 +113,8 @@ export function GeometryRow(props: GeometryRowProps) {
                     </div>
                     <div>
                       <dt>Match</dt>
-                      <dd title={rungDescription[record.rung]}>
-                        {rungLabel[record.rung]}
+                      <dd title={rungDescription(record.rung)}>
+                        {rungLabel(record.rung)}
                       </dd>
                     </div>
                   </dl>
@@ -134,7 +134,7 @@ export function GeometryRow(props: GeometryRowProps) {
               ) : (
                 <p className={styles.noReference}>
                   No reference distribution — matched by{' '}
-                  {rungLabel[record.rung]} only, so this geometry can’t be
+                  {rungLabel(record.rung)} only, so this geometry can’t be
                   scored.
                 </p>
               )}

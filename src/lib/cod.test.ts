@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { elementOf, recordElements, reportElements } from './cod'
+import {
+  elementOf,
+  orderedRungs,
+  recordElements,
+  reportElements,
+  rungLabel,
+  rungRank,
+} from './cod'
 import type { AngleRecord, BondRecord } from '@/types/cod'
 
 // Only the atom-name fields matter here; the rest of the record is unused by
@@ -47,5 +54,50 @@ describe('reportElements', () => {
       angles: [angle('O12', 'P11', 'BR1')],
     }
     expect(reportElements(report)).toEqual(['Br', 'C', 'O', 'P'])
+  })
+})
+
+describe('rungLabel', () => {
+  it('labels a known single-token rung', () => {
+    expect(rungLabel('full')).toBe('exact match')
+    expect(rungLabel('element')).toBe('element only')
+  })
+
+  it('labels each token of a v5 per-atom compound', () => {
+    expect(rungLabel('main / nb1nb2')).toBe('main-type match / neighbour match')
+  })
+
+  it('never returns blank for an unknown token', () => {
+    expect(rungLabel('some_new_rung')).toBe('some new rung')
+    expect(rungLabel('')).toBe('unknown')
+  })
+})
+
+describe('rungRank', () => {
+  it('ranks more specific matches ahead of coarser ones', () => {
+    expect(rungRank('full')).toBeLessThan(rungRank('nb1nb2'))
+    expect(rungRank('nb1nb2')).toBeLessThan(rungRank('element'))
+  })
+
+  it('ranks a compound by its least-specific token', () => {
+    expect(rungRank('full / nb2')).toBe(rungRank('nb2'))
+  })
+})
+
+describe('orderedRungs', () => {
+  it('lists distinct rungs best → worst, keeping unknown values', () => {
+    const records = [
+      { rung: 'element' },
+      { rung: 'full' },
+      { rung: 'nb1nb2' },
+      { rung: 'full' },
+      { rung: 'mystery' },
+    ]
+    expect(orderedRungs(records)).toEqual([
+      'full',
+      'nb1nb2',
+      'element',
+      'mystery',
+    ])
   })
 })
