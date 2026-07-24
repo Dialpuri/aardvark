@@ -473,6 +473,9 @@
   display: flex;
   flex-direction: column;
   gap: 0.125rem;
+  /* Let a long "Match" value wrap instead of forcing the row wider than the
+     panel (v5 rungs can be per-atom compounds like "2nd neighbour / ring"). */
+  min-width: 0;
 }
 
 .figures dt {
@@ -487,6 +490,7 @@
   font-family: var(--font-mono), serif;
   font-size: 0.8125rem;
   color: var(--ink);
+  overflow-wrap: break-word;
 }
 
 .figures dd[title] {

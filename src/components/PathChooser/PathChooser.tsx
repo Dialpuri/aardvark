@@ -18,14 +18,21 @@ const OPTIONS: PathOption[] = [
     title: 'A dictionary',
     tagline: 'idealised geometry',
     body: 'Check the target geometry in a restraints dictionary. Provide an restraint dictionary directly (AceDRG, ELBOW, Grade), or a SMILES / InChI and we build one on the server first.',
-    accepts: 'dictionary CIF · SMILES · InChI',
+    accepts: 'dictionary CIF ',
   },
   {
     mode: 'model',
-    title: 'A model or ligand',
+    title: 'A model with a ligand',
     tagline: 'observed geometry',
     body: 'Check the geometry as actually built. Provide a coordinate model naming a ligand, or a standalone ligand file, and we score the measured bonds and angles.',
-    accepts: 'PDB · mmCIF · MOL / SDF',
+    accepts: 'PDB · mmCIF ',
+  },
+  {
+    mode: 'chemistry',
+    title: 'A chemical string',
+    tagline: 'computed geometry',
+    body: 'Start from a chemical description alone. Provide a SMILES / InChI or a MOL / SDF file; we run ACEDRG to compute the geometry and then score it against the COD.',
+    accepts: 'SMILES · InChI',
   },
 ]
 

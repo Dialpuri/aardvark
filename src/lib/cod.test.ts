@@ -59,12 +59,12 @@ describe('reportElements', () => {
 
 describe('rungLabel', () => {
   it('labels a known single-token rung', () => {
-    expect(rungLabel('full')).toBe('exact match')
-    expect(rungLabel('element')).toBe('element only')
+    expect(rungLabel('full')).toBe('exact')
+    expect(rungLabel('element')).toBe('element')
   })
 
   it('labels each token of a v5 per-atom compound', () => {
-    expect(rungLabel('main / nb1nb2')).toBe('main-type match / neighbour match')
+    expect(rungLabel('main / nb1nb2')).toBe('main type / neighbours')
   })
 
   it('never returns blank for an unknown token', () => {

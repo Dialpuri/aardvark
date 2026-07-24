@@ -6,11 +6,12 @@ export type InputFormat = 'smiles' | 'inchi' | 'cif' | 'mol' | 'pdb'
 /**
  * Which of the two validation paths a request follows:
  * - `dictionary` — validate *idealised* restraint geometry (an ACEDRG/restraints
- *   dictionary, or a SMILES/InChI the server runs ACEDRG on first).
+ *   dictionary).
  * - `model` — validate *observed* geometry measured from real coordinates (a
  *   PDB/mmCIF model naming a ligand, or a standalone ligand coordinate file).
+ * - 'chemistry' - run acedrg and validate
  */
-export type AnalyseMode = 'dictionary' | 'model'
+export type AnalyseMode = 'dictionary' | 'model' | 'chemistry'
 
 /**
  * A structure to run through Aardvark: the raw text plus a tag telling the

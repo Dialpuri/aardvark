@@ -14,12 +14,17 @@ const MODE_COPY: Record<AnalyseMode, { title: string; subtitle: string }> = {
   dictionary: {
     title: 'Validate a dictionary',
     subtitle:
-      'Paste a SMILES / InChI string or upload a restraints dictionary. An ACEDRG dictionary is created (if needed) and its target geometry is scored against the COD.',
+      'Upload a restraints dictionary (.cif). Its idealised target geometry is scored against the COD.',
   },
   model: {
     title: 'Validate a model or ligand',
     subtitle:
       'Upload a coordinate model naming a ligand, or a standalone ligand file. The modelled geometry is measured and scored against the COD.',
+  },
+  chemistry: {
+    title: 'Compute geometry and validate',
+    subtitle:
+      'Paste a SMILES / InChI string. ACEDRG computes the geometry from the chemistry and the result is scored against the COD.',
   },
 }
 

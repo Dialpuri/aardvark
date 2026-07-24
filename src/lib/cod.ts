@@ -65,16 +65,20 @@ const RUNG_TOKEN_RANK: Record<RungToken, number> = {
   element: 6,
 }
 
-/** Human-readable name for each known rung token. */
+/**
+ * Concise name for each known rung token. Kept short because it shows under a
+ * "Match" heading (so the word "match" is redundant) and v5 can join two of
+ * them into a per-atom compound — spelling each out in full overflows the slot.
+ */
 const RUNG_TOKEN_LABEL: Record<RungToken, string> = {
-  full: 'exact match',
-  main: 'main-type match',
-  main_type: 'main-type match',
-  nb1nb2: 'neighbour match',
-  nb2: 'second-neighbour match',
-  inring: 'ring match',
-  hybrid: 'hybrid match',
-  element: 'element only',
+  full: 'exact',
+  main: 'main type',
+  main_type: 'main type',
+  nb1nb2: 'neighbours',
+  nb2: '2nd neighbour',
+  inring: 'ring',
+  hybrid: 'hybrid',
+  element: 'element',
 }
 
 /** Longer explanation of how specific each known rung token's match was. */
