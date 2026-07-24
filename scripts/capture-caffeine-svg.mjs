@@ -81,4 +81,6 @@ const svg = mol.get_svg_with_highlights(
 mol.delete()
 
 await writeFile(OUT, svg)
-console.log(`wrote ${path.relative(process.cwd(), OUT.pathname)} (${svg.length} bytes)`)
+console.log(
+  `wrote ${path.relative(process.cwd(), OUT.pathname)} (${svg.length} bytes)`,
+)
