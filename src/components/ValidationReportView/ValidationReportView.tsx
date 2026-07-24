@@ -18,7 +18,7 @@ import type { AnalyseResponse } from '@/types/cod'
 import styles from './ValidationReportView.module.css'
 
 async function loadSample(): Promise<AnalyseResponse> {
-  const res = await fetch(`${import.meta.env.BASE_URL}sample/A1C3B.json`)
+  const res = await fetch(`${import.meta.env.BASE_URL}sample/A1AG3.json`)
   if (!res.ok) throw new Error(`Failed to load sample report (${res.status})`)
   return withMockDictionary(await res.json())
 }

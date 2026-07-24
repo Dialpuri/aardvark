@@ -14,7 +14,13 @@ export interface ReportCoordinates {
 /**
  * Coordinates for the ligand to render in 3D. The analysis server will
  * eventually return these on the report (see {@link AnalyseResponse.coordinates});
- * until then we fall back to a bundled mock so the viewer has something to show.
+ * until then we fall back to bundled mock coordinates so the viewer has
+ * something to show.
+ *
+ * The mock file only holds the A1C3B sample's coordinates, so it's used solely
+ * for that ligand — any other report without server coordinates has no matching
+ * structure, and we surface that (a failed load) rather than render the wrong
+ * molecule underneath it.
  */
 export async function loadReportCoordinates(
   report: AnalyseResponse,
@@ -24,6 +30,9 @@ export async function loadReportCoordinates(
       text: report.coordinates,
       name: `${reportCompId(report) ?? 'ligand'}.cif`,
     }
+  }
+  if (reportCompId(report) !== 'A1C3B') {
+    throw new Error('No coordinates available for this ligand.')
   }
   const res = await fetch(MOCK_COORDINATES_URL)
   if (!res.ok) {
